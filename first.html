@@ -520,9 +520,21 @@ var placeSearch, autocomplete;
         <!-- Modal body -->
         <div class="modal-body">
             <table class="table">
-                <tr ng-repeat="day in daily_timings track by $index">
-                    <td>{{day}}</td>
-                </tr>
+                
+               <thead>
+                    <tr>
+                        <th>{{current_day_time.day}}</th>
+                        <th>{{current_day_time.time}}</th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+                    <tr ng-repeat="timestamp in arr_day_time track by $index">
+                        <td>{{timestamp.day}}</td>
+                        <td>{{timestamp.time}}</td>
+                    </tr>
+                </tbody>
+               
             </table>
         </div>
         
@@ -730,7 +742,10 @@ var placeSearch, autocomplete;
                      $scope.current_timings='';
                      $scope.open_now= true;
                      $scope.daily_timings=[];
+                     $scope.arr_day_time=[];
                      $scope.current_day = moment.utc().utcOffset(-420).day();
+                   
+                     $scope.current_day_time=[];
                      $scope.directions_display = '';
                      $scope.directions_service= '';
                      $scope.formHeaders = ['Default','Airport','Amusement Park','Aquarium','Art Gallery','Bakery','Bar','Beauty Salon','Bowling Alley','Bus Station','Cafe','Campground','Car rental','Casino','Lodging','Movie Theater','Museum','Night Club','Park','Parking','Restaurant','Shopping Mall','Stadium','Subway Station','Taxi Stand','Transit Station','Travel Agency','Zoo'];
@@ -1009,9 +1024,37 @@ var placeSearch, autocomplete;
 
 
                                    var timings = place.opening_hours.weekday_text.splice(utc_day-1).concat(place.opening_hours.weekday_text.splice(0,utc_day-1));
-                                   $scope.daily_timings = timings;
-
-
+                                
+                                   $scope.daily_timings=timings;
+                                   
+                                   $scope.arr_day_time=[]
+                                   var isFirstRow= false;
+                                   for(var index=0;index<timings.length; ++index)
+                                       {
+                                           
+                                           var day_time={}
+                                           day_time.day= timings[index].split('y:')[0]+'y';
+                                           day_time.time = timings[index].split('y:')[1];
+                                           if(!isFirstRow)
+                                               {
+                                                   $scope.current_day_time = day_time;
+                                                   isFirstRow = true;
+                                               }
+                                           else
+                                               {
+                                                   $scope.arr_day_time.push(day_time);
+                                               }
+                                           
+                                           
+                                           //console.log(timings[index]);
+                                           //console.log(timings[index].split('y:')[0]+'y');
+                                           //console.log(timings[index].split('y:')[1]);
+                                           //var time_arr= time.trim().split(':');
+                                           //console.log(time_arr[0]);
+                                           //console.log(time_arr[1]);
+                                       }
+                                       
+                                   console.log($scope.arr_day_time);
                                    var country='';
                                    var state= '';
                                    var city= '';
@@ -1037,10 +1080,7 @@ var placeSearch, autocomplete;
                                           }
                                       }
                                    }
-                                  // console.log(country);
-                                  // console.log(state);
-                                  // console.log(city);
-                                  // console.log(place.vicinity);
+                                  
 
                                    var formData={};
                                    formData.country = country;

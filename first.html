@@ -491,21 +491,7 @@ var placeSearch, autocomplete;
             <td ng-init="open_now= true"><div ng-show="!open_now">Closed<span><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
                 <div ng-show="open_now">Open now: {{current_timings}}<span><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
 
-                  <!--
-                <div id="timings" class="modal" role="dialog">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <table class="table">
-                              <tr><td><p>vfbf</p></td>-->
-
-                              <!--<tr ng-repeat="day in daily_timings track by $index">
-                                <td>{{day}}</td>-->
-                              
-                    
-                 <!-- </div>
-                </div>
-                </div>-->
+                  
           
                 <div class="modal fade" id="timings">
     <div class="modal-dialog modal-dialog-centered">
@@ -769,10 +755,28 @@ var placeSearch, autocomplete;
                        //console.log(formData.distance);
                        var radVal = $('input[type=radio][name=options]:checked').val();
                        console.log(radVal);
+                         
+                       var isError = false;
+                         
                        if(radVal=='second')
                        {
                            formData.place= $('#location').val();
-                           console.log(formData.place);
+                           //console.log(formData.place);
+                           var geocoder = new google.maps.Geocoder();
+                           geocoder.geocode( { 'address': formData.place}, function(results, status) {
+                              if (status == 'OK') {
+                                
+                                console.log(results[0].geometry.location.lat());
+                                console.log(results[0].geometry.location.lng());
+                                  
+                                formData.lat = results[0].geometry.location.lat();
+                                formData.lon = results[0].geometry.location.lng();
+                                
+                                
+                              } else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                              }
+                            });
                        }
 
                        else {

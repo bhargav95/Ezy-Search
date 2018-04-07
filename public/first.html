@@ -22,8 +22,10 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!--<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>-->
- 
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBn0GiQxOP7NmQNom0hY8YPlmDozSiopSE&libraries=places"></script>
 
+   <script src="bower_components/angular-google-places-autocomplete/src/autocomplete.js"></script>
+   <link rel="stylesheet" href="bower_components/angular-google-places-autocomplete/src/autocomplete.css">
     <style>
         #loader {
             display: none;
@@ -127,6 +129,7 @@
                   //console.log('Ajax response');
                   lat = result['lat'];
                   lon = result['lon'];
+                 
                 }
 
               })
@@ -162,7 +165,7 @@
         <div class='row align-items-center'>
             <div class='offset-lg-2 col-lg-8'>
 
-                <form class="bg-light" id='infoForm' name='infoForm' ng-model="myForm">
+                <form class="bg-light" id='infoForm' name='infoForm'>
                     <div class='form-group row'>
                         <h3 class="col-lg-10 text-center title"><i>Travel and Entertainment Search</i></h3>
                     </div>
@@ -189,7 +192,7 @@
                         <label for="distance" class='col-lg-2 control-label'>Distance</label>
                         <div class='col-lg-offset-2 col-lg-6'>
                             <input type="number" id="distance" name="distance" class="form-control" placeholder="10">
-                            <input vs-google-autocomplete ng-model="address" name="address" type="text">
+                            
                         </div>
                     </div>
                     <div class="form-group row">
@@ -205,7 +208,8 @@
                             <div class='form-check'>
                                 <label for="options2"> </label>
                                 <input type="radio" name="options" id="options2" value="second"> Others, Please specify:
-                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>
+                                <input  type="text" class="form-control" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required  g-places-autocomplete ng-model="location"/>
+<!--                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>-->
                                 <div class='invalid-feedback'>Please enter a location.</div>
 
                             </div>
@@ -217,7 +221,8 @@
 
                     <div class="form-group row">
                         <div class='col-lg-4'>
-                            <button type="submit" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="myForm.$invalid">Search</button>
+                            <button type="submit" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$dirty && infoForm.keyword.$invalid ||
+  infoForm.location.$dirty && infoForm.location.$invalid || infoForm.$untouched">Search</button>
                             <button type="button" name="clear" class="btn btn-danger">Clear</button>
 
                         </div>
@@ -561,7 +566,7 @@
     <script>
         //Example starter JavaScript for disabling form submissions if there are invalid fields
 
-        var app = angular.module('myApp', ['rateYo']);
+        var app = angular.module('myApp', ['rateYo','google.places']);
         // angular.module('myApp').requires.push('vsGoogleAutocomplete');
         //  var myAppModule = angular.module('myApp', ['rateYo']);
         app.controller('myCtrl', function($scope, $http) {
@@ -627,65 +632,40 @@
                 }
                 //console.log(formData.distance);
                 var radVal = $('input[type=radio][name=options]:checked').val();
-                console.log(radVal);
-
+                //console.log(radVal);
+                //console.log($scope.location);
+                
+               
                 var isError = false;
                 $scope.comp_results = [];
 
                 if (radVal == 'second') {
-                    formData.place = $('#location').val();
-                    console.log(formData.place);
-                    var geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({
-                        'address': formData.place
-                    }, function(results, status) {
-                        if (status == 'OK') {
-
-                            console.log(results[0].geometry.location.lat());
-                            console.log(results[0].geometry.location.lng());
-
-                            formData.lat = results[0].geometry.location.lat();
-                            formData.lon = results[0].geometry.location.lng();
-                        } else {
-                            console.log(lat);
-                        }
-                        /*$http.get('/nearbysearch', {params: {
-                         keyword: formData.keyword,
-                         category: formData.category,
-                         distance: formData.distance,
-                         place: formData.place,
-                         lat: formData.lat,
-                         lon: formData.lon
-                       }}).then(function (response) {
-                         if (response.data.status !=undefined)
-                            //console.log('Success');
-                            console.log(response.data);
-
-                            //console.log(submitted);
-                            if(response.data.status=='OK')
-                            {
-                               $scope.submitted = true;
-                               $scope.results= response.data.results;
-
-                            }
-
-                         }, function (response) {
-
-                            console.log('fail');
-
-                         });
-
-                                
-                              } else {
-                                alert('Geocode was not successful for the following reason: ' + status);
-                              }
-                            });*/
-                    });
-                } else {
+                    
+                     if($scope.location.formatted_address!== undefined)
+                    {
+                        console.log($scope.location.geometry.location.lat());
+                        console.log($scope.location.geometry.location.lng());
+                        //console.log($scope.location.formatted_address);
+                        formData.lat= $scope.location.geometry.location.lat();
+                        formData.lon = $scope.location.geometry.location.lng();
+                        formData.place = $scope.location.formatted_address;
+                    }
+                    
+                    else
+                    {
+                        formData.place= $('#location').val();
+                        
+                    }
+                    //formData.place = $('#location').val();
+                    //console.log(formData.place);
+                    
+                       
+                } 
+                else {
                     
                     formData.lat = lat;
                     formData.lon = lon;
-                    console.log(formData);
+                    //console.log(formData);
                 }
 
                 console.log('Reached nearbysearch');
@@ -1109,10 +1089,6 @@
     </script>
 
     <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBn0GiQxOP7NmQNom0hY8YPlmDozSiopSE&libraries=places">
-
-
-    </script>
-</body>
+   </body>
 
 </html>

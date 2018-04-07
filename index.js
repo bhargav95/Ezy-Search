@@ -114,7 +114,52 @@ app.get('/nextPageSearch', function(req,res)
                         }
                    );
     });
-        
+      
+app.get('/geocoding', function(req,res)
+        {
+            console.log('Geocoding request received');
+            if(req.query.lat=== undefined)
+            {
+                request.get('https://maps.googleapis.com/maps/api/geocode/json?address='+req.query.place+'&key='+geocode_key,
+                        (error,response,body) =>
+                           {
+                    let geocode_json = JSON.parse(body);
+                    //console.log(geocode_json.results[0].geometry.location);
+                    console.log('Latitude and longitude not set');
+                    req.query.lat= geocode_json.results[0].geometry.location.lat;
+                    req.query.lon= geocode_json.results[0].geometry.location.lng;
+                    nearbysearch(req,res);
+                    
+                });
+            }
+            else
+            {
+                nearbysearch(req,res);
+            }
+            
+        }
+       );
+
+function nearbysearch(req, res)
+{
+    var lat = req.query.lat;
+    var lon= req.query.lon;
+    var radius= req.query.distance*1600;
+    console.log('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lon+'&radius='+radius+'&type='+req.query.category+'&keyword='+req.query.keyword+'&key='+nearby_key);
+    
+    request.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lon+'&radius='+radius+'&type='+req.query.category+'&keyword='+req.query.keyword+'&key='+nearby_key,
+          (error,response,body) =>
+          {
+            //nearbyinfo = body;
+            //console.log(body);
+            res.send(body);
+            
+
+          });
+
+}
+
+/*
 app.get('/nearbysearch', function(req,res)
     {
         console.log('request recieved');
@@ -142,34 +187,15 @@ app.get('/nearbysearch', function(req,res)
           {
             nearbyinfo = body;
             res.send(body);
-            //console.log(nearbyinfo.next_page_token);
-            //sleep(2000);
-            //next_tok = nearbyinfo.next_page_token;
-            //var query = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken='+nearbyinfo.next_page_token+'&key='+nearby_key;
-            //console.log(query);
-            //sleep(1000);
-            /*
-            if(next_tok!= undefined)
-            {
-
-              request.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken='+next_tok+'&key='+nearby_key,
-                (error,response,body) =>
-                {
-                    console.log(body);
-                    //nearbyinfo = JSON.parse(body);
-                    //next_tok= nearbyinfo.next_page_token;
-                }
-
-              );
-            }
-             */
+            
 
           });
 
         //res.send(nearbyinfo);
 
     }
-)
+)*/
+
 app.listen(3152,function(){
   console.log('Listening mate');
 });

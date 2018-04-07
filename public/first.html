@@ -1,0 +1,1118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Document</title>
+    <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <!--<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>-->
+    <script type="text/javascript" src="bower_components/jquery-rateyo/min/jquery.rateyo.min.js"></script>
+    <link href="bower_components/jquery-rateyo/min/jquery.rateyo.min.css" rel="stylesheet">
+    <script type="text/javascript" src="bower_components/angular-rating-yo/src/angular-rating-yo.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.0/moment.min.js"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>-->
+ 
+
+    <style>
+        #loader {
+            display: none;
+
+        }
+
+        .nav-right {
+            float: right;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 25%);
+            grid-column-gap: 10px;
+
+            margin: 0;
+
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .has-error {
+            border: 1px solid red;
+        }
+
+        .selected {
+            background-color: yellow;
+        }
+
+        #placeDetailsMap {
+            height: 500px;
+            width: 400px;
+
+        }
+
+        #streetview {
+            height: 500px;
+            width: 400px;
+        }
+
+        #right-panel {
+            height: 100%;
+            width: 34%;
+        }
+
+    </style>
+    <script>
+       
+
+             var favorites = [];
+             var pageData='';
+             var lat="0";
+             var lon="0";
+             var table;
+             var headers = ['#','Category','Name','Address','Favorite','Details'];
+
+             var submitted= false;
+
+             function tweetwindow()
+             {
+
+               //console.log('JavaScript window');
+               windowOptions = 'scrollbars=yes,resizable=yes,toolbar=no,location=yes',
+                width = 550,
+                height = 420,
+                winHeight = screen.height,
+                winWidth = screen.width;
+
+                left = Math.round((winWidth / 2) - (width / 2));
+                top = 0;
+
+                if (winHeight > height) {
+                  top = Math.round((winHeight / 2) - (height / 2));
+                }
+
+              var tweetText = 'Check out NAME located	at ADDRESS.Website:URL #TravelAndEntertainmentSearch';
+              var hashTags= '';
+              var url= ''
+              window.open("https://twitter.com/intent/tweet?text="+tweetText,'intent',windowOptions + ',width=' + width +
+                                           ',height=' + height + ',left=' + left + ',top=' + top);
+
+
+                return false;
+             }
+
+            $("#myModal").click(function() {
+                    $(this).modal();
+                });
+
+             $(document).ready(function()
+             {
+                $.ajax({ url: '/geolocation', success: function(result)
+                {
+                  $('#search').prop('disabled', false);
+                  //alert(JSON.parse(result));
+                  //console.log('Ajax response');
+                  lat = result['lat'];
+                  lon = result['lon'];
+                }
+
+              })
+             }
+
+           );
+
+
+           $(document).ready(function() {
+     $('input[type=radio][name=options]').change(function() {
+         if (this.value == 'second') {
+
+            $('#location').prop('disabled',false);
+
+             //alert("Allot Thai Gayo Bhai");
+         }
+         else {
+                var placeholder = $('#location').attr('placeholder');
+                $('#location').prop('disabled',true);
+                $('#location').reset();
+         }
+     });
+ });
+
+    </script>
+ </head>
+<body ng-app='myApp' ng-controller='myCtrl'>
+    <div id="map"></div>
+
+
+
+    <div class='container-fluid'>
+        <div class='row align-items-center'>
+            <div class='offset-lg-2 col-lg-8'>
+
+                <form class="bg-light" id='infoForm' name='infoForm' ng-model="myForm">
+                    <div class='form-group row'>
+                        <h3 class="col-lg-10 text-center title"><i>Travel and Entertainment Search</i></h3>
+                    </div>
+                    <div class="form-group row">
+                        <label for="keyword" class='col-lg-2 control-label'>Keyword</label>
+                        <div class='col-lg-offset-2 col-lg-6'>
+                            <input type="text" id="keyword" name="keyword" ng-class="{'is-invalid' : infoForm.keyword.$invalid && infoForm.keyword.$touched }" ng-model="keyword" class="form-control" required>
+                            <div class='invalid-feedback'>Please enter a keyword.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+
+                        <label for="category" class='col-lg-2'>Category</label>
+
+                        <div class='col-lg-6'>
+                            <select class="form-control col-lg-*" id="category" name="category">
+                    <option ng-repeat="x in formHeaders" value=x>{{x}}</option>
+                  </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="distance" class='col-lg-2 control-label'>Distance</label>
+                        <div class='col-lg-offset-2 col-lg-6'>
+                            <input type="number" id="distance" name="distance" class="form-control" placeholder="10">
+                            <input vs-google-autocomplete ng-model="address" name="address" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class='control-label col-lg-2'> From </label>
+                        <div class='col-lg-6' id='radioButton'>
+
+                            <div class='form-check'>
+                                <label for="options1"></label>
+                                <input type="radio" name="options" id="options1" value="first" checked ng-click="infoForm.location.$touched=false"> Current location
+
+                            </div>
+
+                            <div class='form-check'>
+                                <label for="options2"> </label>
+                                <input type="radio" name="options" id="options2" value="second"> Others, Please specify:
+                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>
+                                <div class='invalid-feedback'>Please enter a location.</div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class='col-lg-4'>
+                            <button type="submit" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="myForm.$invalid">Search</button>
+                            <button type="button" name="clear" class="btn btn-danger">Clear</button>
+
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+
+            <div class='container' ng-init="isres= true">
+                <div class='container col-lg-4 col-offset-6 centered'>
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="pills-home-tab" ng-click="isres=true" data-toggle="pill" href="#res" role="tab" aria-controls="pills-home" aria-selected="true">Result</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-profile-tab" ng-init="getOldFavs()" ng-click="isres=false" data-toggle="pill" href="#favorites" role="tab" aria-controls="pills-profile" aria-selected="false">Favorites</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="progress" id="mainbar" ng-show="isprogress== true">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" id="pbar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 50%;"></div>
+        </div>
+    </div>
+
+
+    <div class='container' id="res" ng-show="isres">
+        <div class="float-right">
+            <button disabled>Details<i class="fa fa-chevron-right"></i></button>
+        </div>
+        <table class="table" ng-init="selectedIndex=-1">
+            <thead>
+                <tr>
+                    <td ng-repeat="x in headers">{{x}}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in comp_results[page_index]" ng-class="{selected: selectedIndex==$index}">
+                    <td>{{$index+page_index*20+1}}</td>
+                    <td><img ng-src="{{row.icon}}" width="50px"></td>
+                    <td>{{row.name}}</td>
+                    <td>{{row.vicinity}}</td>
+                    <td><button ng-click="addfavorite(row.place_id,$index)" id="{{row.place_id}}">
+          <i class="fa fa-star-o" ></i>
+        </button></td>
+                    <td ng-init="placeDetails==false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row); selectedIndex=$index"></i></button></td>
+
+                </tr>
+
+            </tbody>
+        </table>
+
+
+        <div class='text-center'>
+            <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
+            <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
+        </div>
+
+
+    </div>
+
+
+    <div class="container" ng-show="placeDetails==true">
+
+        <h2 class="text-center" ng-init="place_title=''">{{place_title}}</h2>
+
+
+        <!-- Nav tabs -->
+        <div class="float-left">
+            <button><i class="fa fa-chevron-left" ng-click="goBack()"></i>List</button>
+        </div>
+        <div class="float-right">
+            <button id={{place_id}}>
+
+              <i class="fa fa-star-o"></i>
+          </button>
+
+            <button onclick="tweetwindow()">
+            <img src="http://cs-server.usc.edu:45678/hw/hw8/images/Twitter.png" style="width: 30px">
+            
+          </button>
+        </div>
+
+
+        <div class="container">
+            <ul class="nav nav-tabs justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#tab1">Info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab2">Photos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab3">Map</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab4">Reviews</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="tab1" class="container tab-pane active">
+                <table class='table table-striped'>
+                    <tr>
+                        <th>Address</th>
+                        <td>{{place_det[0].formatted_address}}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone Number</th>
+                        <td>{{place_det[0].international_phone_number}}</td>
+                    </tr>
+                    <tr>
+                        <th>Price Level</th>
+                        <td>{{place_det[0].price_level}}</td>
+                    </tr>
+                    <tr>
+                        <th>Rating</th>
+                        <td><div><span>{{place_det[0].rating}}</span><span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: place_det[0].rating, starWidth: '20px'}"></rate-yo></span></div></td>
+                    </tr>
+                    <tr>
+                        <th>Google Page</th>
+                        <td><a target="_blank" href="{{place_det[0].url}}">{{place_det[0].url}}</a></td>
+                    </tr>
+                    <tr>
+                        <th>Website</th>
+                        <td><a target="_blank" href="{{place_det[0].website}}">{{place_det[0].website}}</a></td>
+                    </tr>
+                    <tr>
+                        <th>Hours</th>
+                        <td ng-init="open_now= true">
+                            <div ng-show="!open_now">Closed<span><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
+                            <div ng-show="open_now">Open now: {{current_timings}}<span><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
+
+
+
+                            <div class="modal fade" id="timings">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+
+                                        <!-- Modal Header -->
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">Open hours</h4>
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+
+                                        <!-- Modal body -->
+                                        <div class="modal-body">
+                                            <table class="table">
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{current_day_time.day}}</th>
+                                                        <th>{{current_day_time.time}}</th>
+                                                    </tr>
+
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="timestamp in arr_day_time track by $index">
+                                                        <td>{{timestamp.day}}</td>
+                                                        <td>{{timestamp.time}}</td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+
+                                        <!-- Modal footer -->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div id="tab2" class="container tab-pane fade">
+
+                <div class="grid">
+                    <img ng-src="{{url}}" ng-repeat="url in photos">
+
+                </div>
+
+            </div>
+            <div id="tab3" class="container tab-pane fade">
+                <form name="mapForm" novalidate>
+                    <div class="form-row">
+                        <div class="col-4">
+
+                            <label for="fromlocation">From</label>
+                            <input type="text" class="form-control" id="fromlocation" ng-change="calculateAndDisplayRoute()" ng-model='source' ng-focus="Autocomplete()" placeholder="Your location" required>
+                        </div>
+                        <div class="col-4">
+                            <label for="destination">To</label>
+                            <input type="text" class="form-control" id="destination" value="{{place_det[0].formatted_address}}" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label for="travel_mode">Travel Mode</label>
+                            <select class="form-control" id="travel_mode" name="travel_model">
+                <option value="DRIVING" selected>Driving</option>
+                <option value="BICYCLING">Bicycling</option>
+                <option value="TRANSIT">Transit</option>
+                <option value="WALKING">Walking</option>
+            </select>
+
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" id='directions' ng-disabled="mapForm.source.$pristine" ng-click="getDirections()" name="directions" class="btn btn-primary">Get Directions</button>
+                        </div>
+                    </div>
+
+
+                </form>
+                <img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-show="showMap" ng-click="showMap=false">
+
+                <img style="width:30px; height:30px;" class='button' ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png" ng-show="!showMap" ng-click="showMap= true">
+
+                <div class='container' ng-show="showMap==true">
+                    <div id="placeDetailsMap"></div>
+                    <div id="right-panel"></div>
+                </div>
+                <div class='container' ng-show="showMap==false">
+                    <div id="streetview">
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="tab4" class="container tab-pane fade">
+                <div class="row">
+                    <div class='dropdown'>
+                        <button class="btn btn-secondary dropdown-toggle" ng-model="reviewType" ng-init="reviewType= 'Google Reviews'" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{reviewType}}
+          </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            <button class="dropdown-item" type="button" ng-click="isgoogle= true; reviewType='Google Reviews'">Google Reviews</button>
+                            <button class="dropdown-item" type="button" ng-click="isgoogle= false; reviewType='Yelp Reviews'">Yelp Reviews</button>
+                        </div>
+                    </div>
+
+                    <div class='dropdown'>
+                        <button class="btn btn-secondary dropdown-toggle" ng-model="sortingType" ng-init="sortingType= 'Default Order'" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{sortingType}}
+          </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            <button class="dropdown-item" type="button" ng-click="orderReviews(1); sortingType= 'Default Order'">Default Order</button>
+                            <button class="dropdown-item" type="button" ng-click="orderReviews(2); sortingType= 'Highest Rating'">Highest Rating</button>
+                            <button class="dropdown-item" type="button" ng-click="orderReviews(3); sortingType= 'Lowest Rating'">Lowest Rating</button>
+                            <button class="dropdown-item" type="button" ng-click="orderReviews(4); sortingType='Most Recent'">Most Recent</button>
+                            <button class="dropdown-item" type="button" ng-click="orderReviews(5); sortingType='Least Recent'">Least Recent</button>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class='container' ng-init="isgoogle == true">
+
+
+                    <div class='container'>
+                        <div class='row border' ng-repeat="review in google_reviews | orderBy: sortingOrder" ng-show="isgoogle">
+                            <div class='col-2'>
+                                <a href="{{review.author_url}}"><img ng-src="{{review.profile_photo_url}}" width="50px"></a>
+                            </div>
+                            <div class='col-10'>
+                                <div><a target='_blank' href="{{review.author_url}}">{{review.author_name}}</a></div>
+                                <span class='fa fa-star checked'> </span> <span>{{review.time}}</span>
+                                <div ng-if="review.text.length > 0">
+                                    {{review.text}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="yelp" class='container' ng-show="!isgoogle">
+
+                        <div class='row border' ng-repeat="review in yelp_reviews | orderBy: yelpsortingOrder" ng-show="!isgoogle">
+                            <div class='col-2'>
+                                <a href="{{review.url}}"><img ng-src="{{review.user.image_url}}" width="50px"></a>
+                            </div>
+                            <div class='col-10'>
+                                <div><a target='_blank' href="{{review.url}}">{{review.user.name}}</a></div>
+                                <span class='fa fa-star checked'> </span> <span>{{review.time_created}}</span>
+                                <div ng-if="review.text.length > 0">
+                                    {{review.text}}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class='container' id="favorites" ng-show="isres== false">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td ng-repeat="x in headers">{{x}}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in favorites">
+                    <td>{{$index+1}}</td>
+                    <td><img ng-src="{{row.icon}}" width="50px"></td>
+                    <td>{{row.name}}</td>
+                    <td>{{row.vicinity}}</td>
+                    <td><button ng-click="deletefav(row.place_id,$index)"><i class="fa fa-trash-o"></i></button></td>
+                    <td><button><i class="fa fa-chevron-right"></i></button></td>
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class='progress' id='loader'>
+        <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+        </div>
+
+    </div>
+
+    <script>
+        //Example starter JavaScript for disabling form submissions if there are invalid fields
+
+        var app = angular.module('myApp', ['rateYo']);
+        // angular.module('myApp').requires.push('vsGoogleAutocomplete');
+        //  var myAppModule = angular.module('myApp', ['rateYo']);
+        app.controller('myCtrl', function($scope, $http) {
+            //console.log('yes');
+            $scope.favorites = [];
+            console.log($scope.favorites);
+            $scope.submitted = false;
+            $scope.sortingOrder = null;
+            $scope.place_det = [];
+            $scope.headers = ["#", "Category", "Name", "Address", "Favorite", "Details"];
+            $scope.results = [];
+            $scope.photos = [];
+            $scope.google_reviews = [];
+            $scope.yelp_reviews = [];
+            $scope.yelpsortingOrder = null;
+            $scope.isgoogle = true;
+            $scope.place_id = 'null';
+            $scope.current_timings = '';
+            $scope.open_now = true;
+            $scope.daily_timings = [];
+            $scope.arr_day_time = [];
+            $scope.current_day = moment.utc().utcOffset(-420).day();
+            $scope.page_index = 0;
+            $scope.page_tokens = [];
+            $scope.comp_results = [];
+            $scope.isnext = false;
+
+
+            $scope.isprogress = false;
+            $scope.current_day_time = [];
+            $scope.directions_display = '';
+            $scope.directions_service = '';
+            $scope.formHeaders = ['Default', 'Airport', 'Amusement Park', 'Aquarium', 'Art Gallery', 'Bakery', 'Bar', 'Beauty Salon', 'Bowling Alley', 'Bus Station', 'Cafe', 'Campground', 'Car rental', 'Casino', 'Lodging', 'Movie Theater', 'Museum', 'Night Club', 'Park', 'Parking', 'Restaurant', 'Shopping Mall', 'Stadium', 'Subway Station', 'Taxi Stand', 'Transit Station', 'Travel Agency', 'Zoo'];
+            $scope.place_lat = 0;
+            $scope.place_lon = 0;
+            $scope.set = function() {
+                console.log($scope.isgoogle);
+            }
+
+            $scope.goBack = function() {
+                window.history.back();
+            }
+            $scope.getOldFavs = function() {
+                //console.log('Got me some old favs');
+                //console.log(localStorage);
+                console.log(localStorage);
+                for (var i = 0; i < localStorage.length; ++i) {
+                    var key = localStorage.key(i);
+                    $scope.favorites.push(JSON.parse(localStorage.getItem(key)));
+                }
+                //console.log($scope.favorites);
+            }
+            $scope.getJSON = function() {
+                var formData = {};
+                //$('#mainbar').css('display','block');
+                $scope.isprogress = true;
+                //$('#pbar').css('display','block');
+                formData.keyword = $('#keyword').val();
+                formData.category = $('#category').val();
+                formData.distance = $('#distance').val();
+                if (formData.distance == '') {
+                    formData.distance = 10;
+                }
+                //console.log(formData.distance);
+                var radVal = $('input[type=radio][name=options]:checked').val();
+                console.log(radVal);
+
+                var isError = false;
+                $scope.comp_results = [];
+
+                if (radVal == 'second') {
+                    formData.place = $('#location').val();
+                    console.log(formData.place);
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({
+                        'address': formData.place
+                    }, function(results, status) {
+                        if (status == 'OK') {
+
+                            console.log(results[0].geometry.location.lat());
+                            console.log(results[0].geometry.location.lng());
+
+                            formData.lat = results[0].geometry.location.lat();
+                            formData.lon = results[0].geometry.location.lng();
+                        } else {
+                            console.log(lat);
+                        }
+                        /*$http.get('/nearbysearch', {params: {
+                         keyword: formData.keyword,
+                         category: formData.category,
+                         distance: formData.distance,
+                         place: formData.place,
+                         lat: formData.lat,
+                         lon: formData.lon
+                       }}).then(function (response) {
+                         if (response.data.status !=undefined)
+                            //console.log('Success');
+                            console.log(response.data);
+
+                            //console.log(submitted);
+                            if(response.data.status=='OK')
+                            {
+                               $scope.submitted = true;
+                               $scope.results= response.data.results;
+
+                            }
+
+                         }, function (response) {
+
+                            console.log('fail');
+
+                         });
+
+                                
+                              } else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                              }
+                            });*/
+                    });
+                } else {
+                    
+                    formData.lat = lat;
+                    formData.lon = lon;
+                    console.log(formData);
+                }
+
+                console.log('Reached nearbysearch');
+
+                $http.get('/nearbysearch', {
+                    params: {
+                        keyword: formData.keyword,
+                        category: formData.category,
+                        distance: formData.distance,
+                        place: formData.place,
+                        lat: formData.lat,
+                        lon: formData.lon
+                    }
+                }).then(function(response) {
+                    if (response.data.status != undefined)
+                        //console.log('Success');
+                        console.log(response.data);
+
+                    //console.log(submitted);
+                    if (response.data.status == 'OK') {
+                        $scope.submitted = true;
+                        $scope.results = response.data.results;
+                        $('#pbar').css('display', 'none');
+                        $('#mainbar').css('display', 'none');
+                        $scope.comp_results.push(response.data.results);
+                        if (response.data.next_page_token) {
+                            console.log('Next token present mate');
+                            $scope.isnext = true;
+                            $scope.page_tokens.push(response.data.next_page_token);
+
+                        }
+                    }
+
+                }, function(response) {
+
+                    console.log('fail');
+                    return;
+
+                });
+
+
+
+
+
+            }
+
+            $scope.check = function() {
+                console.log($scope.place_id);
+            }
+
+            $scope.addfavorite = function(fav_id, ind) {
+
+                //console.log(ind);
+                //console.log(fav_id);
+                $('#' + fav_id + ' i').css({
+                    "color": "yellow"
+                }).removeClass('fa-star-o').addClass('fa-star');
+                //console.log($scope.results[ind].place_id);
+
+                if (localStorage.getItem(fav_id) == undefined) {
+                    localStorage.setItem(fav_id, JSON.stringify($scope.results[ind]));
+                    $scope.favorites.push($scope.results[ind]);
+                }
+
+                //console.log('Retrieval: ')
+                //console.log(localStorage.getItem(fav_id));
+                //var $this = ($this);
+                //console.log(place);
+                //console.log($(this).attr('id'));
+
+                //$(this).css({"color": "yellow"}).removeClass('fa-star-o').addClass('fa-star');
+            }
+
+            $scope.deletefav = function(fav_id, ind) {
+                $scope.favorites.splice(ind, 1);
+                localStorage.removeItem(fav_id);
+
+            }
+
+
+            $scope.orderReviews = function(type) {
+                console.log(type);
+                if (type == 1) {
+
+                    $scope.yelpsortingOrder = null;
+                    $scope.sortingOrder = null;
+                } else if (type == 2) {
+
+                    $scope.yelpsortingOrder = '-rating';
+
+                    $scope.sortingOrder = '-rating';
+
+
+
+
+                } else if (type == 3) {
+
+                    $scope.yelpsortingOrder = 'rating';
+
+
+                    $scope.sortingOrder = 'rating';
+
+
+                } else if (type == 4) {
+
+                    $scope.yelpsortingOrder = '-time_created';
+
+                    $scope.sortingOrder = '-time';
+
+
+
+                } else {
+
+                    $scope.yelpsortingOrder = 'time_created';
+
+                    $scope.sortingOrder = 'time';
+
+
+                }
+
+
+
+            }
+
+            $scope.getNextToken = function() {
+                //console.log($scope.page_index);
+                //console.log($scope.page_tokens);
+                //$scope.comp_results.push()
+
+                if ($scope.comp_results[$scope.page_index + 1] !== undefined) {
+                    $scope.page_index += 1;
+
+                } else {
+
+                    $http.get('/nextPageSearch', {
+                        params: {
+                            pagetoken: $scope.page_tokens[$scope.page_index]
+                        }
+                    }).then(function(response) {
+                        //console.log(response.id)
+                        //let yelpJson = JSON.parse(resp)
+                        console.log(response.data.status);
+                        if (response.data.status == 'OK') {
+                            //console.log(response.data);
+                            $scope.page_index += 1;
+                            $scope.comp_results.push(response.data.results);
+                            console.log('Comprehensive list: ');
+                            console.log($scope.comp_results);
+                            if (response.data.next_token) {
+                                $scope.page_tokens.push(response.data.next_token);
+
+                            }
+
+
+                        } else {
+                            console.log('No records found');
+                        }
+
+                    }, function(response) {
+
+                        console.log('fail');
+
+                    });
+
+
+                }
+
+
+            }
+
+            $scope.getPreviousToken = function() {
+                $scope.page_index -= 1;
+            }
+            $scope.getDirections = function() {
+
+                console.log('Got directions')
+                var map = new google.maps.Map(document.getElementById('placeDetailsMap'), {
+                    center: {
+                        lat: -33.866,
+                        lng: 151.196
+                    },
+                    zoom: 15
+                });
+
+                var directionsService = new google.maps.DirectionsService;
+                var directionsDisplay = new google.maps.DirectionsRenderer({
+                    draggable: true,
+                    map: map,
+                    panel: document.getElementById('right-panel')
+                });
+                //var map2= document.getElementById('placeDetailsMap');
+                var start = document.getElementById('fromlocation').value;
+                var end = document.getElementById('destination').value;
+
+                travel_mode = document.getElementById('travel_mode').value;
+                console.log(travel_mode);
+                directionsService.route({
+                    origin: start,
+                    destination: end,
+                    provideRouteAlternatives: true,
+                    travelMode: travel_mode
+                }, function(response, status) {
+                    if (status === 'OK') {
+                        directionsDisplay.setDirections(response);
+                        console.log(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+
+                directionsDisplay.setMap(map);
+                //document.getElementById('fromlocation').addEventListener('change', onChangeHandler);
+            }
+
+
+            $scope.Autocomplete = function() {
+                console.log('called');
+                var autocomplete1 = new google.maps.places.Autocomplete(document.getElementById('fromlocation'));
+                var autocomplete2 = new google.maps.places.Autocomplete(document.getElementById('location'));
+                //autocomplete.addListener('place_changed', fillValue);
+            }
+
+
+            $scope.loadMap = function() {
+                console.log('Div with supposed map initialized');
+            }
+            $scope.getDetails = function(row) {
+                console.log('Row object:');
+                //console.log(row);
+                $scope.placeDetails = true;
+                $scope.place_lat = row.geometry.location.lat;
+                $scope.place_lon = row.geometry.location.lng;
+                //console.log($scope.place_lat);
+                //console.log($scope.place_lon);
+                placeid = row.place_id;
+
+                var myLatLng = {
+                    lat: $scope.place_lat,
+                    lng: $scope.place_lon
+                };
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    center: {
+                        lat: -33.866,
+                        lng: 151.196
+                    },
+                    zoom: 15
+                });
+
+                var map1 = new google.maps.Map(document.getElementById('placeDetailsMap'), {
+                    center: myLatLng,
+                    zoom: 10
+
+                });
+
+                var marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map1,
+                    title: 'Hello World!'
+                });
+
+                var panorama = new google.maps.StreetViewPanorama(
+                    document.getElementById('streetview'), {
+                        position: myLatLng,
+                        pov: {
+                            heading: 165,
+                            pitch: 0
+                        },
+                        zoom: 1
+                    });
+                var service = new google.maps.places.PlacesService(map);
+
+                service.getDetails({
+                    placeId: placeid
+                }, function(place, status) {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        console.log(place);
+                        $scope.place_det[0] = place;
+                        $scope.place_title = place.name;
+                        console.log($scope.place_det[0]);
+                        $scope.place_id = place.place_id;
+                        $scope.place_det[0].price_level = '$'.repeat(place.price_level);
+                        //console.log(place.address_components);
+                        console.log(place.opening_hours.open_now);
+
+                        var utc_day = moment.utc().utcOffset(place.utc_offset).day();
+                        console.log(utc_day);
+                        if (place.opening_hours.open_now == true) {
+
+                            $scope.current_timings = place.opening_hours.weekday_text[utc_day];
+                            var ind = $scope.current_timings.indexOf(":");
+                            $scope.current_timings = $scope.current_timings.slice(ind + 1);
+                            //console.log($scope.current_timings);
+                            $scope.open_now = true;
+
+                        } else {
+                            $scope.open_now = false;
+                        }
+
+
+                        var timings = place.opening_hours.weekday_text.splice(utc_day - 1).concat(place.opening_hours.weekday_text.splice(0, utc_day - 1));
+
+                        $scope.daily_timings = timings;
+
+                        $scope.arr_day_time = []
+                        var isFirstRow = false;
+                        for (var index = 0; index < timings.length; ++index) {
+
+                            var day_time = {}
+                            day_time.day = timings[index].split('y:')[0] + 'y';
+                            day_time.time = timings[index].split('y:')[1];
+                            if (!isFirstRow) {
+                                $scope.current_day_time = day_time;
+                                isFirstRow = true;
+                            } else {
+                                $scope.arr_day_time.push(day_time);
+                            }
+
+
+                            //console.log(timings[index]);
+                            //console.log(timings[index].split('y:')[0]+'y');
+                            //console.log(timings[index].split('y:')[1]);
+                            //var time_arr= time.trim().split(':');
+                            //console.log(time_arr[0]);
+                            //console.log(time_arr[1]);
+                        }
+
+                        console.log($scope.arr_day_time);
+                        var country = '';
+                        var state = '';
+                        var city = '';
+
+
+                        console.log(place.address_components);
+                        for (var index = 0; index < place.address_components.length; ++index) {
+                            for (var j = 0; j < place.address_components[index].types.length; ++j) {
+                                if (place.address_components[index].types[j] == 'country') {
+                                    country = place.address_components[index].short_name;
+
+                                } else if (place.address_components[index].types[j] == 'administrative_area_level_1') {
+                                    state = place.address_components[index].short_name;
+                                } else if (place.address_components[index].types[j] == 'locality') {
+                                    city = place.address_components[index].short_name;
+                                }
+                            }
+                        }
+
+
+                        var formData = {};
+                        formData.country = country;
+                        formData.state = state;
+                        formData.address = place.vicinity;
+                        formData.city = city;
+                        formData.name = place.name;
+                        //console.log(formData);
+                        $http.get('/yelpSearch', {
+                            params: {
+                                country: formData.country,
+                                state: formData.state,
+                                address: place.vicinity,
+                                city: formData.city,
+                                name: formData.name
+                            }
+                        }).then(function(response) {
+                            //console.log(response.id)
+                            //let yelpJson = JSON.parse(resp)
+                            console.log(response.data);
+                            if (response.data.length >= 1) {
+                                var revData = {};
+                                revData.id = response.data.id;
+                                $scope.yelp_reviews = response.data;
+
+
+                            } else {
+                                console.log('No records found');
+                            }
+
+                        }, function(response) {
+
+                            console.log('fail');
+
+                        });
+
+                        if (place.photos) {
+                            for (var index = 0; index < place.photos.length; ++index) {
+                                $scope.photos.push(place.photos[index].getUrl({
+                                    'maxWidth': 200,
+                                    'maxHeight': 200
+                                }));
+                            }
+
+                        }
+
+                        if (place.reviews) {
+                            $scope.google_reviews = place.reviews;
+
+                            for (var index = 0; index < place.reviews.length; ++index) {
+
+                                var val = "#rateYo" + index;
+                                var b = document.getElementById(val);
+
+
+                            }
+
+
+                            for (var index = 0; index < place.reviews.length; ++index) {
+                                $scope.google_reviews[index].time = moment.unix(place.reviews[index].time).format("YYYY-MM-DD HH:mm:ss");
+                            }
+
+
+
+                        }
+
+                        $scope.$apply();
+
+                    }
+                });
+            }
+
+        });
+
+    </script>
+
+    <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBn0GiQxOP7NmQNom0hY8YPlmDozSiopSE&libraries=places">
+
+
+    </script>
+</body>
+
+</html>

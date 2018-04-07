@@ -18,10 +18,11 @@ const client = yelp.client('zscQJboA8f4Dd2e3LSxV4AufNZLiiJ0165WW0NyPDO3wafoyRDi2
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use(express.static(path.join(__dirname,'public')));
 // respond with "hello world" when a GET request is made to the homepage
-app.get('/', function (req, res) {
+/*app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname+'/first.html'));
-})
+})*/
 
 function sleep(milliseconds) {
  var start = new Date().getTime();

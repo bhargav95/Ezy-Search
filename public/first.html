@@ -670,7 +670,7 @@
 
                 console.log('Reached nearbysearch');
 
-                $http.get('/nearbysearch', {
+                $http.get('/geocoding', {
                     params: {
                         keyword: formData.keyword,
                         category: formData.category,
@@ -691,6 +691,7 @@
                         $('#pbar').css('display', 'none');
                         $('#mainbar').css('display', 'none');
                         $scope.comp_results.push(response.data.results);
+                        console.log(response.data);
                         if (response.data.next_page_token) {
                             console.log('Next token present mate');
                             $scope.isnext = true;
@@ -814,11 +815,11 @@
                             $scope.comp_results.push(response.data.results);
                             console.log('Comprehensive list: ');
                             console.log($scope.comp_results);
-                            if (response.data.next_token) {
-                                $scope.page_tokens.push(response.data.next_token);
-
+                            if (response.data.next_page_token) {
+                                $scope.page_tokens.push(response.data.next_page_token);
+                                $scope.isnext = true;
                             }
-
+                            //console.log($scope.page_tokens);
 
                         } else {
                             console.log('No records found');

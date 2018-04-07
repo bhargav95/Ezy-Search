@@ -103,6 +103,17 @@ app.get('/yelpSearch', function(req,res)
     //request.get('https://api.yelp.com/v3/businesses/matches/best?')
 });
 
+app.get('/nextPageSearch', function(req,res)
+    {
+        request.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken='+req.query.pagetoken+'&key='+nearby_key,
+                    (error,response,body) =>
+                        {
+                            console.log(body);
+                            res.send(body);
+                        }
+                   );
+    });
+        
 app.get('/nearbysearch', function(req,res)
     {
         console.log('request recieved');
@@ -113,37 +124,16 @@ app.get('/nearbysearch', function(req,res)
         var keywordnospace = req.query.keyword;
         //sleep(1000);
         keywordnospace = keywordnospace.replace(/\s/g, '');
-        if(req.query.place != undefined)
-        {
-            var placenospace = req.query.place;
-            placenospace = placenospace.replace(/\s/g, '');
-            //console.log(placenospace);
-
-            request.get('https://maps.googleapis.com/maps/api/geocode/json?'+'address='+placenospace+'&key='+geocode_key,
-              (error,response,body) =>
-              {
-
-                var geoinfo = JSON.parse(body);
-                if(geoinfo.status=='OK')
-                {
-                  console.log(geoinfo);
-                  lat = geoinfo.results[0].geometry.location.lat;
-                  lon = geoinfo.results[0].geometry.location.lng;
-                }
-
-              });
-
-        }
-        else {
-          lat = req.query.lat;
-          lon= req.query.lon;
-        }
+        
+        lat = req.query.lat;
+        lon= req.query.lon;
+    
 
         console.log('Reached here');
 
         var radius = (req.query.distance)*1600;
 
-        var next_tok='';
+        //var next_tok='';
         var nearbyinfo='';
         //console.log('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lon+'&radius='+radius+'&type='+req.body.category+'&keyword='+keywordnospace+'&key='+nearby_key);
         request.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lon+'&radius='+radius+'&type='+req.query.category+'&keyword='+req.query.keyword+'&key='+nearby_key,
@@ -179,6 +169,6 @@ app.get('/nearbysearch', function(req,res)
 
     }
 )
-app.listen(3151,function(){
+app.listen(3152,function(){
   console.log('Listening mate');
 });

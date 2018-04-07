@@ -402,7 +402,7 @@ var placeSearch, autocomplete;
                       <a class="nav-link active" id="pills-home-tab" ng-click="isres=true" data-toggle="pill" href="#res" role="tab" aria-controls="pills-home" aria-selected="true">Result</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" id="pills-profile-tab" ng-click="isres=false" data-toggle="pill" href="#favorites" role="tab" aria-controls="pills-profile" aria-selected="false">Favorites</a>
+                      <a class="nav-link" id="pills-profile-tab" ng-init="getOldFavs()" ng-click="isres=false" data-toggle="pill" href="#favorites" role="tab" aria-controls="pills-profile" aria-selected="false">Favorites</a>
                     </li>
 
                   </ul>
@@ -439,8 +439,12 @@ var placeSearch, autocomplete;
                     </tbody>
                   </table>
                   
-                  <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
-                  <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
+                      
+                      <div class='text-center'>
+                          <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
+                          <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
+                      </div>
+                   
                     
                 </div>
                 
@@ -666,7 +670,7 @@ var placeSearch, autocomplete;
 
           <div class='row border' ng-repeat="review in yelp_reviews | orderBy: yelpsortingOrder" ng-show="!isgoogle">
             <div class='col-2'>
-              <a href="{{review.url}}"><img ng-src="{{review.user.image_url}}" width="50px"></img></a>
+              <a href="{{review.url}}"><img ng-src="{{review.user.image_url}}" width="50px">></a>
             </div>
             <div class='col-10'>
               <div><a target='_blank' href="{{review.url}}">{{review.user.name}}</a></div>
@@ -696,11 +700,11 @@ var placeSearch, autocomplete;
                       </thead>
                       <tbody>
                         <tr ng-repeat="row in favorites">
-                        	<td>{{$index+1}}</td>
+                          <td>{{$index+1}}</td>
                           <td><img ng-src="{{row.icon}}" width="50px"></td>
                           <td>{{row.name}}</td>
                           <td>{{row.vicinity}}</td>
-                          <td><button ng-click="deletefav(row.place_id,$index)">Button <i class="fa fa-trash-o"></i></button></td>
+                          <td><button ng-click="deletefav(row.place_id,$index)"><i class="fa fa-trash-o"></i></button></td>
                           <td><button><i class="fa fa-chevron-right"></i></button></td>
 
                       </tr>
@@ -726,6 +730,7 @@ var placeSearch, autocomplete;
                  {
                      //console.log('yes');
                      $scope.favorites = [];
+                     console.log($scope.favorites);
                      $scope.submitted = false;
                      $scope.sortingOrder = null;
                      $scope.place_det= [];
@@ -758,6 +763,19 @@ var placeSearch, autocomplete;
                      $scope.set= function()
                      {
                        console.log($scope.isgoogle);
+                     }
+                     
+                     $scope.getOldFavs= function()
+                     {
+                         //console.log('Got me some old favs');
+                         //console.log(localStorage);
+                         console.log(localStorage);
+                         for(var i=0;i<localStorage.length;++i)
+                             {
+                                 var key= localStorage.key(i);
+                                 $scope.favorites.push(JSON.parse(localStorage.getItem(key)));
+                             }
+                         //console.log($scope.favorites);
                      }
                      $scope.getJSON = function()
                      {

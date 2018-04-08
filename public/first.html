@@ -89,6 +89,35 @@
         {
             opacity: 0.0;
         }
+        
+        @media (min-width: 576px) {
+        
+            .card-columns{
+                column-count: 4;
+            }
+        }
+
+        // Medium devices (tablets, 768px and up)
+        @media (min-width: 768px) {
+            .card-columns{
+                column-count: 4;
+            }
+        }
+
+        // Large devices (desktops, 992px and up)
+        @media (min-width: 992px) {
+            .card-columns{
+                column-count: 4;
+            }
+        }
+
+        // Extra large devices (large desktops, 1200px and up)
+        @media (min-width: 1200px) {
+            .card-columns{
+                column-count: 4;
+            }
+            
+        }
     </style>
     <script>
        
@@ -245,18 +274,79 @@
             </div>
 
 
-            <div class='container' ng-init="isres= true">
+            <div class='container'>
                 <div class='container col-lg-4 col-offset-6 centered'>
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="pills-home-tab" ng-click="isres=true" data-toggle="pill" href="#res" role="tab" aria-controls="pills-home" aria-selected="true">Result</a>
+                            <a class="nav-link active" id="pills-results-tab" data-toggle="pill" href="#res" role="tab" aria-controls="res" aria-selected="true">Result</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="pills-profile-tab" ng-init="getOldFavs()" ng-click="isres=false" data-toggle="pill" href="#favorites" role="tab" aria-controls="pills-profile" aria-selected="false">Favorites</a>
+                            <a class="nav-link" id="pills-favorites-tab"  data-toggle="pill" href="#favs" role="tab" aria-controls="favs" aria-selected="false">Favorites</a>
                         </li>
 
                     </ul>
                 </div>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class='tab-pane fade show active' aria-labelledby="pills-results-tab" id="res" ng-show="comp_results.length > 0">
+                <div class="float-right">
+                    <button ng-disabled="selectedIndex==-1">Details<i class="fa fa-chevron-right"></i></button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td ng-repeat="x in headers">{{x}}</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-success': $index==selectedIndex}">
+                            <td>{{$index+page_index*20+1}}</td>
+                            <td><img ng-src="{{row.icon}}" width="50px"></td>
+                            <td>{{row.name}}</td>
+                            <td>{{row.vicinity}}</td>
+                            <td><button  ng-click="addfavorite(row.place_id,$index)" id="{{row.place_id}}">
+                  <i class="fa fa-star" ng-class='{favs: checkFavorite(row.place_id)}'></i>
+                </button></td>
+                            <td ng-init="placeDetails==false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row,$index)"></i></button></td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+
+
+                <div class='text-center'>
+                    <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
+                    <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
+                </div>
+
+
+            </div>
+                <div class='tab-pane fade' aria-labelledby="pills-favorites-tab" id="favs">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td ng-repeat="x in headers">{{x}}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in favorites track by $index">
+                    <td>{{$index+1}}</td>
+                    <td><img ng-src="{{row.icon}}" width="50px"></td>
+                    <td>{{row.name}}</td>
+                    <td>{{row.vicinity}}</td>
+                    <td><button ng-click="deletefav(row.place_id,$index)"><i class="fa fa-trash-o"></i></button></td>
+                    <td><button><i class="fa fa-chevron-right"></i></button></td>
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+                
+                </div>
+                
+
             </div>
 
         </div>
@@ -266,41 +356,7 @@
     </div>
 
 
-    <div class='container' id="res" ng-show="showresults">
-        <div class="float-right">
-            <button ng-disabled="selectedIndex==-1">Details<i class="fa fa-chevron-right"></i></button>
-        </div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <td ng-repeat="x in headers">{{x}}</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-success': $index==selectedIndex}">
-                    <td>{{$index+page_index*20+1}}</td>
-                    <td><img ng-src="{{row.icon}}" width="50px"></td>
-                    <td>{{row.name}}</td>
-                    <td>{{row.vicinity}}</td>
-                    <td><button  ng-click="addfavorite(row.place_id,$index)" id="{{row.place_id}}">
-          <i class="fa fa-star" ng-class='{favs: checkFavorite(row.place_id)}'></i>
-        </button></td>
-                    <td ng-init="placeDetails==false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row,$index); isres=false; showresults=false;"></i></button></td>
-
-                </tr>
-
-            </tbody>
-        </table>
-
-
-        <div class='text-center'>
-            <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
-            <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
-        </div>
-
-
-    </div>
-
+    
 
     <div class="container" ng-show="placeDetails==true">
 
@@ -367,7 +423,7 @@
                     </tr>
                     <tr>
                         <th>Rating</th>
-                        <td><div><span>{{place_det[0].rating}}</span><span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: place_det[0].rating, starWidth: '20px'}"></rate-yo></span></div></td>
+                        <td><span style='display: inline;'>{{place_det[0].rating}}</span><span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: place_det[0].rating, starWidth: '20px'}"></rate-yo></span></td>
                     </tr>
                     <tr>
                         <th>Google Page</th>
@@ -433,8 +489,11 @@
             <div id="tab2" class="container tab-pane fade">
 
                 <div class="card-columns">
-                    <img ng-src="{{url}}" ng-repeat="url in photos">
-
+                    <div class="card"  ng-repeat="url in photos">
+                        <a href="{{url}}" target="_blank">
+                           <img class="card-img-top" ng-src="{{url}}"></a>
+                    </div>
+                    
                 </div>
 
             </div>
@@ -564,36 +623,10 @@
         </div>
     </div>
 
+   
+
     
-
-    <div class='container' id="favorites" ng-show="isres== false">
-        <table class="table">
-            <thead>
-                <tr>
-                    <td ng-repeat="x in headers">{{x}}</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="row in favorites">
-                    <td>{{$index+1}}</td>
-                    <td><img ng-src="{{row.icon}}" width="50px"></td>
-                    <td>{{row.name}}</td>
-                    <td>{{row.vicinity}}</td>
-                    <td><button ng-click="deletefav(row.place_id,$index)"><i class="fa fa-trash-o"></i></button></td>
-                    <td><button><i class="fa fa-chevron-right"></i></button></td>
-
-                </tr>
-
-            </tbody>
-        </table>
-    </div>
-
-
-    <div class='progress' id='loader'>
-        <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-        </div>
-
-    </div>
+    
 
     <script>
         //Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -626,6 +659,7 @@
             $scope.comp_results = [];
             $scope.isnext = false;
             
+            $scope.placeDetails= false;
             $scope.selectedIndex = -1;
 
 
@@ -653,8 +687,11 @@
                 }
                 //console.log($scope.favorites);
             }
+            
+            $scope.getOldFavs();
             $scope.getJSON = function() {
                 var formData = {};
+                //console.log($scope.favorites);
                 //$('#mainbar').css('display','block');
                 $scope.isprogress = true;
                 //$('#pbar').css('display','block');

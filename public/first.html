@@ -205,7 +205,7 @@
 
     <div class='container-fluid'>
         <div class='row align-items-center'>
-            <div class='offset-lg-2 col-lg-8' ng-init="showresults=false">
+            <div class='offset-lg-2 col-lg-8'>
 
                 <form class="bg-light" id='infoForm' name='infoForm'>
                     <div class='form-group row'>
@@ -263,9 +263,9 @@
 
                     <div class="form-group row">
                         <div class='col-lg-4'>
-                            <button type="submit" ng-click="getJSON(); showresults=true" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$dirty && infoForm.keyword.$invalid ||
+                            <button type="submit" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$dirty && infoForm.keyword.$invalid ||
   infoForm.location.$dirty && infoForm.location.$invalid || infoForm.$untouched"><i class="fa fa-search"></i>Search</button>
-                            <button type="button" name="clear" class='btn'>Clear</button>
+                            <button type="button" name="clear" class='btn btn-light'>Clear</button>
 
                         </div>
 
@@ -287,7 +287,7 @@
                     </ul>
                 </div>
                 <div class="tab-content" id="nav-tabContent">
-                    <div class='tab-pane fade show active' aria-labelledby="pills-results-tab" id="res" ng-show="comp_results.length > 0">
+                    <div class='tab-pane fade show active' aria-labelledby="pills-results-tab" id="res" ng-show="comp_results.length > 0 && showRes ">
                 <div class="float-right">
                     <button ng-disabled="selectedIndex==-1">Details<i class="fa fa-chevron-right"></i></button>
                 </div>
@@ -298,7 +298,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-success': $index==selectedIndex}">
+                        <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-warning': $index==selectedIndex}">
                             <td>{{$index+page_index*20+1}}</td>
                             <td><img ng-src="{{row.icon}}" width="50px"></td>
                             <td>{{row.name}}</td>
@@ -306,7 +306,7 @@
                             <td><button  ng-click="addfavorite(row.place_id,$index)" id="{{row.place_id}}">
                   <i class="fa fa-star" ng-class='{favs: checkFavorite(row.place_id)}'></i>
                 </button></td>
-                            <td ng-init="placeDetails==false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row,$index)"></i></button></td>
+                            <td ng-init="placeDetails=false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row,$index,true)"></i></button></td>
 
                         </tr>
 
@@ -322,7 +322,7 @@
 
             </div>
                 <div class='tab-pane fade' aria-labelledby="pills-favorites-tab" id="favs">
-        <table class="table">
+        <table class="table" ng-show="favorites.length > 0">
             <thead>
                 <tr>
                     <td ng-repeat="x in headers">{{x}}</td>
@@ -341,6 +341,9 @@
 
             </tbody>
         </table>
+        <div class="alert alert-warning" role="alert" ng-show="favorites.length==0">
+          No records found.
+        </div>
     </div>
 
                 
@@ -413,23 +416,23 @@
                         <th>Address</th>
                         <td>{{place_det[0].formatted_address}}</td>
                     </tr>
-                    <tr>
+                    <tr ng-show="place_det[0].international_phone_number!== null">
                         <th>Phone Number</th>
                         <td>{{place_det[0].international_phone_number}}</td>
                     </tr>
-                    <tr>
+                    <tr ng-show="place_det[0].price_level!== null">
                         <th>Price Level</th>
                         <td>{{place_det[0].price_level}}</td>
                     </tr>
-                    <tr>
+                    <tr ng-show="place_det[0].rating!==null">
                         <th>Rating</th>
                         <td><span style='display: inline;'>{{place_det[0].rating}}</span><span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: place_det[0].rating, starWidth: '20px'}"></rate-yo></span></td>
                     </tr>
-                    <tr>
+                    <tr ng-show="place_det[0].url !== null">
                         <th>Google Page</th>
                         <td><a target="_blank" href="{{place_det[0].url}}">{{place_det[0].url}}</a></td>
                     </tr>
-                    <tr>
+                    <tr ng-show="place_det[0].website!==null">
                         <th>Website</th>
                         <td><a target="_blank" href="{{place_det[0].website}}">{{place_det[0].website}}</a></td>
                     </tr>
@@ -488,12 +491,15 @@
 
             <div id="tab2" class="container tab-pane fade">
 
-                <div class="card-columns">
-                    <div class="card"  ng-repeat="url in photos">
+                <div class="card-columns" ng-show="photos.length > 0">
+                    <div class="card"  ng-repeat="url in photos track by $index">
                         <a href="{{url}}" target="_blank">
                            <img class="card-img-top" ng-src="{{url}}"></a>
                     </div>
                     
+                </div>
+                <div class="alert alert-warning" role="alert" ng-show="photos.length==0">
+                  No photos found.
                 </div>
 
             </div>
@@ -659,7 +665,14 @@
             $scope.comp_results = [];
             $scope.isnext = false;
             
+            
+            $scope.showRes = true;
+            $scope.showFav = false;
             $scope.placeDetails= false;
+            
+            $scope.favClick= false;
+            $scope.resClick = false;
+            
             $scope.selectedIndex = -1;
 
 
@@ -675,7 +688,19 @@
             }
 
             $scope.goBack = function() {
-                window.history.back();
+                console.log($scope.resClick);
+                if($scope.resClick)
+                {
+                    $scope.placeDetails = false;
+                    $scope.showRes= true;
+                }
+                
+                else
+                {
+                    $scope.placeDetails = false;
+                    $scope.showFav = true;
+                }
+                //window.history.back();
             }
             $scope.getOldFavs = function() {
                 //console.log('Got me some old favs');
@@ -691,9 +716,14 @@
             $scope.getOldFavs();
             $scope.getJSON = function() {
                 var formData = {};
+                $scope.placeDetails = false;
+                $scope.showRes= true;
+                $scope.showFav = false;
+                
                 //console.log($scope.favorites);
                 //$('#mainbar').css('display','block');
                 $scope.isprogress = true;
+                $scope.selectedIndex = -1;
                 //$('#pbar').css('display','block');
                 formData.keyword = $('#keyword').val();
                 formData.category = $('#category').val();
@@ -1032,7 +1062,23 @@
             $scope.loadMap = function() {
                 console.log('Div with supposed map initialized');
             }
-            $scope.getDetails = function(row,ind) {
+            $scope.getDetails = function(row,ind, isRes) {
+                
+                //console.log(isRes);
+                 $scope.showRes=false;
+                $scope.showFav=false;
+                if(isRes)
+                    {
+                        $scope.resClick=true;
+                        $scope.favClick= false;
+                       
+                    }
+                else
+                    {
+                        $scope.resClick = false;
+                        $scope.favClick = true;
+                        
+                    }
                 console.log('Row object:');
                 //console.log(row);
                 $scope.placeDetails = true;

@@ -59,23 +59,36 @@
         .selected {
             background-color: yellow;
         }
-
+        
+        .unselected
+        {
+            background-color: white;
+        }
         #placeDetailsMap {
             height: 500px;
-            width: 400px;
+            width: 100%;
 
         }
 
         #streetview {
             height: 500px;
-            width: 400px;
+            width: 100%;
         }
 
         #right-panel {
             height: 100%;
-            width: 34%;
+            width: 100%;
         }
-
+        
+        .favs
+        {
+            color: yellow;
+        }
+        
+        .nofavs
+        {
+            opacity: 0.0;
+        }
     </style>
     <script>
        
@@ -89,7 +102,7 @@
 
              var submitted= false;
 
-             function tweetwindow()
+             /*function tweetwindow()
              {
 
                //console.log('JavaScript window');
@@ -115,7 +128,7 @@
 
                 return false;
              }
-
+*/
             $("#myModal").click(function() {
                     $(this).modal();
                 });
@@ -163,7 +176,7 @@
 
     <div class='container-fluid'>
         <div class='row align-items-center'>
-            <div class='offset-lg-2 col-lg-8'>
+            <div class='offset-lg-2 col-lg-8' ng-init="showresults=false">
 
                 <form class="bg-light" id='infoForm' name='infoForm'>
                     <div class='form-group row'>
@@ -221,9 +234,9 @@
 
                     <div class="form-group row">
                         <div class='col-lg-4'>
-                            <button type="submit" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$dirty && infoForm.keyword.$invalid ||
-  infoForm.location.$dirty && infoForm.location.$invalid || infoForm.$untouched">Search</button>
-                            <button type="button" name="clear" class="btn btn-danger">Clear</button>
+                            <button type="submit" ng-click="getJSON(); showresults=true" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$dirty && infoForm.keyword.$invalid ||
+  infoForm.location.$dirty && infoForm.location.$invalid || infoForm.$untouched"><i class="fa fa-search"></i>Search</button>
+                            <button type="button" name="clear" class='btn'>Clear</button>
 
                         </div>
 
@@ -253,26 +266,26 @@
     </div>
 
 
-    <div class='container' id="res" ng-show="isres">
+    <div class='container' id="res" ng-show="showresults">
         <div class="float-right">
-            <button disabled>Details<i class="fa fa-chevron-right"></i></button>
+            <button ng-disabled="selectedIndex==-1">Details<i class="fa fa-chevron-right"></i></button>
         </div>
-        <table class="table" ng-init="selectedIndex=-1">
+        <table class="table">
             <thead>
                 <tr>
                     <td ng-repeat="x in headers">{{x}}</td>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in comp_results[page_index]" ng-class="{selected: selectedIndex==$index}">
+                <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-success': $index==selectedIndex}">
                     <td>{{$index+page_index*20+1}}</td>
                     <td><img ng-src="{{row.icon}}" width="50px"></td>
                     <td>{{row.name}}</td>
                     <td>{{row.vicinity}}</td>
-                    <td><button ng-click="addfavorite(row.place_id,$index)" id="{{row.place_id}}">
-          <i class="fa fa-star-o" ></i>
+                    <td><button  ng-click="addfavorite(row.place_id,$index)" id="{{row.place_id}}">
+          <i class="fa fa-star" ng-class='{favs: checkFavorite(row.place_id)}'></i>
         </button></td>
-                    <td ng-init="placeDetails==false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row); selectedIndex=$index"></i></button></td>
+                    <td ng-init="placeDetails==false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row,$index); isres=false; showresults=false;"></i></button></td>
 
                 </tr>
 
@@ -295,20 +308,28 @@
 
 
         <!-- Nav tabs -->
-        <div class="float-left">
-            <button><i class="fa fa-chevron-left" ng-click="goBack()"></i>List</button>
-        </div>
-        <div class="float-right">
-            <button id={{place_id}}>
+        <div class="row">
+        
+            <div class="col-12">
+        
+            <div class="float-left">
+                <button ng-click="goBack()"><i class="fa fa-chevron-left" ></i>List</button>
+            </div>
+            <div class="float-right">
+                <button id={{place_id}} >
 
-              <i class="fa fa-star-o"></i>
-          </button>
+                <i class="fa fa-star" ng-class='{favs: checkFavorite(place_id), nofavs: !checkFavorite(place_id)}'></i>
+                </button>
 
-            <button onclick="tweetwindow()">
-            <img src="http://cs-server.usc.edu:45678/hw/hw8/images/Twitter.png" style="width: 30px">
+                <button ng-click="tweetwindow()">
+                <img src="http://cs-server.usc.edu:45678/hw/hw8/images/Twitter.png" style="width: 30px">
             
-          </button>
+                </button>
+            </div>
+            </div>
         </div>
+        
+        
 
 
         <div class="container">
@@ -411,7 +432,7 @@
 
             <div id="tab2" class="container tab-pane fade">
 
-                <div class="grid">
+                <div class="card-columns">
                     <img ng-src="{{url}}" ng-repeat="url in photos">
 
                 </div>
@@ -500,7 +521,7 @@
                             </div>
                             <div class='col-10'>
                                 <div><a target='_blank' href="{{review.author_url}}">{{review.author_name}}</a></div>
-                                <span class='fa fa-star checked'> </span> <span>{{review.time}}</span>
+                                <span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '20px'}"></rate-yo>  </span><span>{{review.time}}</span>
                                 <div ng-if="review.text.length > 0">
                                     {{review.text}}
                                 </div>
@@ -517,7 +538,7 @@
                             </div>
                             <div class='col-10'>
                                 <div><a target='_blank' href="{{review.url}}">{{review.user.name}}</a></div>
-                                <span class='fa fa-star checked'> </span> <span>{{review.time_created}}</span>
+                                <span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '20px'}"></rate-yo> </span> <span>{{review.time_created}}</span>
                                 <div ng-if="review.text.length > 0">
                                     {{review.text}}
                                 </div>
@@ -593,6 +614,8 @@
             $scope.page_tokens = [];
             $scope.comp_results = [];
             $scope.isnext = false;
+            
+            $scope.selectedIndex = -1;
 
 
             $scope.isprogress = false;
@@ -712,7 +735,35 @@
 
 
             }
+            
+            
+            $scope.tweetwindow = function()
+            {
+                
+               //console.log('JavaScript window');
+               windowOptions = 'scrollbars=yes,resizable=yes,toolbar=no,location=yes',
+                width = 550,
+                height = 420,
+                winHeight = screen.height,
+                winWidth = screen.width;
+                console.log($scope.place_det[0]);
+                left = Math.round((winWidth / 2) - (width / 2));
+                top = 0;
 
+                if (winHeight > height) {
+                  top = Math.round((winHeight / 2) - (height / 2));
+                }
+
+              var tweetText = 'Check out '+$scope.place_det[0].name+' located at '+ $scope.place_det[0].formatted_address+' Website: '+$scope.place_det[0].website;
+              var hashTags= ['TravelAndEntertainmentSearch'];
+              var url= ''
+              window.open("https://twitter.com/intent/tweet?text="+tweetText+'&hashtags='+hashTags,'intent',windowOptions + ',width=' + width +
+                                           ',height=' + height + ',left=' + left + ',top=' + top);
+
+
+              //return false;
+            
+            }
             $scope.check = function() {
                 console.log($scope.place_id);
             }
@@ -721,12 +772,12 @@
 
                 //console.log(ind);
                 //console.log(fav_id);
-                $('#' + fav_id + ' i').css({
+               /* $('#' + fav_id + ' i').css({
                     "color": "yellow"
-                }).removeClass('fa-star-o').addClass('fa-star');
+                }).removeClass('fa-star-o').addClass('fa-star');*/
                 //console.log($scope.results[ind].place_id);
 
-                if (localStorage.getItem(fav_id) == undefined) {
+                if (localStorage.getItem(fav_id) === null) {
                     localStorage.setItem(fav_id, JSON.stringify($scope.results[ind]));
                     $scope.favorites.push($scope.results[ind]);
                 }
@@ -836,6 +887,27 @@
 
 
             }
+            
+            $scope.checkFavorite = function(placeID)
+            {
+                //console.log(placeID);
+                if(localStorage.getItem(placeID)!== null)
+                    {
+                        
+                      
+                        return true;
+                    }
+                    
+                else
+                    {
+                        /*console.log('No');
+                          $('i .fa .fa-star').css({
+                            }).removeClass('fa-star-o').addClass('fa-star');*/
+                        return false;
+                    }
+                    
+            }
+           
 
             $scope.getPreviousToken = function() {
                 $scope.page_index -= 1;
@@ -860,7 +932,17 @@
                 //var map2= document.getElementById('placeDetailsMap');
                 var start = document.getElementById('fromlocation').value;
                 var end = document.getElementById('destination').value;
-
+                
+                var temp = start.toLowerCase();
+                
+                if(temp==='my location' || temp==='' || temp==='your location')
+                {
+                    console.log('It is my location');
+                    console.log(lat);
+                    console.log(lon);
+                    start = new google.maps.LatLng(lat,lon);
+                }
+                
                 travel_mode = document.getElementById('travel_mode').value;
                 console.log(travel_mode);
                 directionsService.route({
@@ -893,16 +975,18 @@
             $scope.loadMap = function() {
                 console.log('Div with supposed map initialized');
             }
-            $scope.getDetails = function(row) {
+            $scope.getDetails = function(row,ind) {
                 console.log('Row object:');
                 //console.log(row);
                 $scope.placeDetails = true;
+               // $scope.unselectedIndex= $scope.selectedIndex;
                 $scope.place_lat = row.geometry.location.lat;
                 $scope.place_lon = row.geometry.location.lng;
                 //console.log($scope.place_lat);
                 //console.log($scope.place_lon);
                 placeid = row.place_id;
-
+                $scope.selectedIndex =ind;
+                //console.log('Unselected Indx: '+$scope.unselectedIndex);
                 var myLatLng = {
                     lat: $scope.place_lat,
                     lng: $scope.place_lon
@@ -931,10 +1015,10 @@
                     document.getElementById('streetview'), {
                         position: myLatLng,
                         pov: {
-                            heading: 165,
+                            heading: 270,
                             pitch: 0
                         },
-                        zoom: 1
+                        visible: true
                     });
                 var service = new google.maps.places.PlacesService(map);
 
@@ -985,12 +1069,7 @@
                             }
 
 
-                            //console.log(timings[index]);
-                            //console.log(timings[index].split('y:')[0]+'y');
-                            //console.log(timings[index].split('y:')[1]);
-                            //var time_arr= time.trim().split(':');
-                            //console.log(time_arr[0]);
-                            //console.log(time_arr[1]);
+                          
                         }
 
                         console.log($scope.arr_day_time);

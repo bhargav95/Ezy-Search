@@ -316,9 +316,9 @@
                 <button ng-click="goBack()"><i class="fa fa-chevron-left" ></i>List</button>
             </div>
             <div class="float-right">
-                <button id={{place_id}} >
+                <button id={{place_id}} ng-click="addFavoriteDets(place_id)" >
 
-                <i class="fa fa-star" ng-class='{favs: checkFavorite(place_id), nofavs: !checkFavorite(place_id)}'></i>
+                <i class="fa fa-star" ng-class='{favs: checkFavorite(place_id)}'></i>
                 </button>
 
                 <button ng-click="tweetwindow()">
@@ -439,7 +439,8 @@
 
             </div>
             <div id="tab3" class="container tab-pane fade">
-                <form name="mapForm" novalidate>
+                <div class="container">
+                    <form name="mapForm" novalidate>
                     <div class="form-row">
                         <div class="col-4">
 
@@ -453,23 +454,33 @@
                         <div class="col-2">
                             <label for="travel_mode">Travel Mode</label>
                             <select class="form-control" id="travel_mode" name="travel_model">
-                <option value="DRIVING" selected>Driving</option>
-                <option value="BICYCLING">Bicycling</option>
-                <option value="TRANSIT">Transit</option>
-                <option value="WALKING">Walking</option>
-            </select>
+                                <option value="DRIVING" selected>Driving</option>
+                                <option value="BICYCLING">Bicycling</option>
+                                <option value="TRANSIT">Transit</option>
+                                <option value="WALKING">Walking</option>
+                            </select>
 
                         </div>
                         <div class="col-2">
+                            <label ng-show="false"></label>
                             <button type="submit" id='directions' ng-disabled="mapForm.source.$pristine" ng-click="getDirections()" name="directions" class="btn btn-primary">Get Directions</button>
                         </div>
                     </div>
 
 
                 </form>
-                <img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-show="showMap" ng-click="showMap=false">
+                <div class='row'>
+                
+                     <img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-show="showMap" ng-click="showMap=false">
 
-                <img style="width:30px; height:30px;" class='button' ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png" ng-show="!showMap" ng-click="showMap= true">
+                    <img style="width:30px; height:30px;" class='button' ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png" ng-show="!showMap" ng-click="showMap= true">
+                
+                </div>
+                   
+                
+                </div>
+                
+                
 
                 <div class='container' ng-show="showMap==true">
                     <div id="placeDetailsMap"></div>
@@ -767,7 +778,16 @@
             $scope.check = function() {
                 console.log($scope.place_id);
             }
-
+            
+            
+            $scope.addFavoriteDets= function(place_id)
+            {
+                if (localStorage.getItem(place_id) === null) {
+                    //console.log($scope.place_det[0]);
+                    localStorage.setItem(place_id, JSON.stringify($scope.place_det[0]));
+                    $scope.favorites.push($scope.place_det[0]);
+                }
+            }
             $scope.addfavorite = function(fav_id, ind) {
 
                 //console.log(ind);

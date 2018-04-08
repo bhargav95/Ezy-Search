@@ -162,7 +162,7 @@
                     $(this).modal();
                 });
 
-             $(document).ready(function()
+            /* $(document).ready(function()
              {
                 $.ajax({ url: '/geolocation', success: function(result)
                 {
@@ -177,10 +177,10 @@
               })
              }
 
-           );
+           );*/
 
 
-           $(document).ready(function() {
+         /*  $(document).ready(function() {
      $('input[type=radio][name=options]').change(function() {
          if (this.value == 'second') {
 
@@ -195,7 +195,7 @@
          }
      });
  });
-
+*/
     </script>
  </head>
 <body ng-app='myApp' ng-controller='myCtrl'>
@@ -224,8 +224,8 @@
                         <label for="category" class='col-lg-2'>Category</label>
 
                         <div class='col-lg-6'>
-                            <select class="form-control col-lg-*" id="category" name="category">
-                    <option ng-repeat="x in formHeaders" value=x>{{x}}</option>
+                            <select class="form-control col-lg-*" id="category" name="category" ng-model="category">
+                    <option ng-repeat="x in formHeaders" value={{x}}>{{x}}</option>
                   </select>
                         </div>
                     </div>
@@ -243,14 +243,14 @@
 
                             <div class='form-check'>
                                 <label for="options1"></label>
-                                <input type="radio" name="options" id="options1" value="first" checked ng-click="infoForm.location.$touched=false"> Current location
+                                <input type="radio" name="options" id="options1" value="first" ng-model="radVal" checked > Current location
 
                             </div>
 
                             <div class='form-check'>
                                 <label for="options2"> </label>
-                                <input type="radio" name="options" id="options2" value="second"> Others, Please specify:
-                                <input  type="text" class="form-control" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required  g-places-autocomplete ng-model="location"/>
+                                <input type="radio" name="options" id="options2" value="second" ng-model="radVal"> Others, Please specify:
+                                <input  type="text" class="form-control" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' ng-disabled="radVal=='first'" required  g-places-autocomplete ng-model="location"/>
 <!--                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>-->
                                 <div class='invalid-feedback'>Please enter a location.</div>
 
@@ -261,11 +261,11 @@
                     </div>
 
 
-                    <div class="form-group row">
+                   <div class="form-group row">
                         <div class='col-lg-4'>
-                            <button type="submit" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$dirty && infoForm.keyword.$invalid ||
-  infoForm.location.$dirty && infoForm.location.$invalid || infoForm.$untouched"><i class="fa fa-search"></i>Search</button>
-                            <button type="button" name="clear" class='btn btn-light'>Clear</button>
+                            <button type="submit" ng-init="geolocation()" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$invalid ||
+  (radVal=='second' && infoForm.location.$invalid)|| !geolocate"><i class="fa fa-search"></i>Search</button>
+                            <button type="button" name="clear" ng-click="clearAll()" class='btn btn-light'>Clear</button>
 
                         </div>
 
@@ -278,10 +278,10 @@
                 <div class='container col-lg-4 col-offset-6 centered'>
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="pills-results-tab" data-toggle="pill" href="#res" role="tab" aria-controls="res" aria-selected="true">Result</a>
+                            <a class="nav-link active" id="pills-results-tab" ng-click="placeDetails=false;showRes=true;" data-toggle="pill" href="#res" role="tab" aria-controls="res" aria-selected="true">Result</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="pills-favorites-tab"  data-toggle="pill" href="#favs" role="tab" aria-controls="favs" aria-selected="false">Favorites</a>
+                            <a class="nav-link" id="pills-favorites-tab" ng-click="placeDetails=false;showFav=true;" data-toggle="pill" href="#favs" role="tab" aria-controls="favs" aria-selected="false">Favorites</a>
                         </li>
 
                     </ul>
@@ -335,7 +335,7 @@
                     <td>{{row.name}}</td>
                     <td>{{row.vicinity}}</td>
                     <td><button ng-click="deletefav(row.place_id,$index)"><i class="fa fa-trash-o"></i></button></td>
-                    <td><button><i class="fa fa-chevron-right"></i></button></td>
+                    <td ng-init="placeDetails=false"><button><i class="fa fa-chevron-right" ng-click="getDetails(row,$index,false)"></i></button></td>
 
                 </tr>
 
@@ -536,7 +536,8 @@
                 </form>
                 <div class='row'>
                 
-                     <img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-show="showMap" ng-click="showMap=false">
+                     <img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-show="showMap" ng-click="showMap=false; google.maps.event.trigger(document.getElementById('streetview'), 'resize');
+  ">
 
                     <img style="width:30px; height:30px;" class='button' ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png" ng-show="!showMap" ng-click="showMap= true">
                 
@@ -664,7 +665,7 @@
             $scope.page_tokens = [];
             $scope.comp_results = [];
             $scope.isnext = false;
-            
+            $scope.radVal = 'first';
             
             $scope.showRes = true;
             $scope.showFav = false;
@@ -675,7 +676,9 @@
             
             $scope.selectedIndex = -1;
 
-
+            $scope.geolocate = false;
+            
+            
             $scope.isprogress = false;
             $scope.current_day_time = [];
             $scope.directions_display = '';
@@ -683,6 +686,7 @@
             $scope.formHeaders = ['Default', 'Airport', 'Amusement Park', 'Aquarium', 'Art Gallery', 'Bakery', 'Bar', 'Beauty Salon', 'Bowling Alley', 'Bus Station', 'Cafe', 'Campground', 'Car rental', 'Casino', 'Lodging', 'Movie Theater', 'Museum', 'Night Club', 'Park', 'Parking', 'Restaurant', 'Shopping Mall', 'Stadium', 'Subway Station', 'Taxi Stand', 'Transit Station', 'Travel Agency', 'Zoo'];
             $scope.place_lat = 0;
             $scope.place_lon = 0;
+            $scope.category= 'Default';
             $scope.set = function() {
                 console.log($scope.isgoogle);
             }
@@ -713,6 +717,23 @@
                 //console.log($scope.favorites);
             }
             
+            $scope.clearAll = function()
+            {
+                var key= document.getElementById('keyword');
+                key.value='';
+                document.getElementById('distance').innerHTML='';
+                if($scope.radVal=='second')
+                    {
+                        document.getElementById('location').value='';
+                        $scope.radVal='first';
+                    }
+                //document.getElementById('category').value='Default';
+                $scope.category='Default';
+                $scope.showRes= false;
+                $scope.showFav = false;
+                $scope.placeDetails= false;
+            }
+            
             $scope.getOldFavs();
             $scope.getJSON = function() {
                 var formData = {};
@@ -726,8 +747,10 @@
                 $scope.selectedIndex = -1;
                 //$('#pbar').css('display','block');
                 formData.keyword = $('#keyword').val();
-                formData.category = $('#category').val();
+                formData.category = $scope.category.toLowerCase().replace(" ","_");
                 formData.distance = $('#distance').val();
+                console.log(formData.distance);
+                console.log(formData.category);
                 if (formData.distance == '') {
                     formData.distance = 10;
                 }
@@ -764,8 +787,8 @@
                 } 
                 else {
                     
-                    formData.lat = lat;
-                    formData.lon = lon;
+                    formData.lat = $scope.lat;
+                    formData.lon = $scope.lon;
                     //console.log(formData);
                 }
 
@@ -1062,6 +1085,27 @@
             $scope.loadMap = function() {
                 console.log('Div with supposed map initialized');
             }
+            
+            $scope.geolocation = function()
+            {
+               $http.get("http://ip-api.com/json")
+                .then(function(response) {
+                    //First function handles success
+                    var jsonData = response.data;
+                    console.log(jsonData);
+                    $scope.lat = response.data.lat;
+                    $scope.lon = response.data.lon;
+                    console.log($scope.lat);
+                    console.log($scope.lon);
+                    $scope.geolocate = true;
+                   console.log($scope.geolocate);
+                }, function(response) {
+                    //Second function handles error
+                    //$scope.content = "Something went wrong";
+                    console.log('Error');
+                });
+
+            }
             $scope.getDetails = function(row,ind, isRes) {
                 
                 //console.log(isRes);
@@ -1071,16 +1115,18 @@
                     {
                         $scope.resClick=true;
                         $scope.favClick= false;
+                        console.log('Results button clicked');
                        
                     }
                 else
                     {
                         $scope.resClick = false;
                         $scope.favClick = true;
+                        console.log('Favorite button clicked');
                         
                     }
                 console.log('Row object:');
-                //console.log(row);
+                console.log(row);
                 $scope.placeDetails = true;
                // $scope.unselectedIndex= $scope.selectedIndex;
                 $scope.place_lat = row.geometry.location.lat;
@@ -1113,7 +1159,8 @@
                     map: map1,
                     title: 'Hello World!'
                 });
-
+                
+               
                 var panorama = new google.maps.StreetViewPanorama(
                     document.getElementById('streetview'), {
                         position: myLatLng,
@@ -1123,6 +1170,7 @@
                         },
                         visible: true
                     });
+                google.maps.event.trigger(document.getElementById('streetview'), 'resize');
                 var service = new google.maps.places.PlacesService(map);
 
                 service.getDetails({

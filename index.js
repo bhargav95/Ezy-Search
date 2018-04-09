@@ -196,6 +196,6 @@ app.get('/nearbysearch', function(req,res)
     }
 )*/
 
-app.listen(3152,function(){
+app.listen(3154,function(){
   console.log('Listening mate');
 });

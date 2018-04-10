@@ -640,18 +640,19 @@
             <div id="tab3" class="container tab-pane fade">
                 <div class="container">
                     <form name="mapForm" novalidate>
-                    <div class="form-row">
-                        <div class="col-4">
+                        <div class="form-row">
+                        
+                            <div class="form-group col-md-4">
 
-                            <label for="fromlocation">From</label>
-                            <input type="text" class="form-control" id="fromlocation" ng-change="calculateAndDisplayRoute()" ng-model='source' ng-focus="Autocomplete()" placeholder="Your location" required>
-                        </div>
-                        <div class="col-4">
-                            <label for="destination">To</label>
+                                <label for="fromlocation" class="form-check-label">From</label>
+                                <input type="text" class="form-control" id="fromlocation"  ng-model='source' ng-focus="Autocomplete()" required>
+                            </div>
+                        <div class="form-group col-md-4">
+                            <label for="destination" class="form-check-label">To</label>
                             <input type="text" class="form-control" id="destination" value="{{place_det[0].formatted_address}}" readonly>
                         </div>
-                        <div class="col-2">
-                            <label for="travel_mode">Travel Mode</label>
+                        <div class="form-group col-md-2">
+                            <label for="travel_mode" class="form-check-label">Travel Mode</label>
                             <select class="form-control" id="travel_mode" name="travel_model">
                                 <option value="DRIVING" selected>Driving</option>
                                 <option value="BICYCLING">Bicycling</option>
@@ -660,27 +661,27 @@
                             </select>
 
                         </div>
-                        <div class="col-2">
-                            <div ng-show="false">BSFBBDS</div>
-                            <button type="submit" id='directions' ng-disabled="mapForm.source.$pristine" ng-click="getDirections()" name="directions" class="btn btn-primary" style="margin-top: 30px;">Get Directions</button>
+                        <div class="form-group col-md-2">
+                            
+                            <button type="submit" id='directions' ng-disabled="mapForm.source.$pristine" ng-click="getDirections()" name="directions" class="btn btn-primary mt-4" >Get Directions</button>
                         </div>
                     </div>
 
 
                 </form>
                 
-                   
+                   <div class='row'>
                 
-                </div>
-                
-                
-                <div class='row'>
-                
-                     <img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-show="showMap" ng-click="panorama()">
+                    <button type="button" class="btn" ng-show="showMap" ng-click="showMap=false"><img style="width:30px; height:30px;" class='button' ng-init="showMap=true" ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ></button>
 
-                    <img style="width:30px; height:30px;" class='button' ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png" ng-show="!showMap" ng-click="showMap= true">
+                    <button type="button" class="btn" ng-show="!showMap" ng-click="showMap=true"><img style="width:30px; height:30px;" class='button' ng-src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png" ></button> 
                 
                 </div>
+                
+                </div>
+                
+                
+                
                 <div class='container' ng-show="showMap==true">
                     <div id="placeDetailsMap"></div>
                     <div id="right-panel"></div>
@@ -739,7 +740,7 @@
                     <div class='container google-rev'>
                         <div class='row border'  ng-repeat="review in google_reviews | orderBy: sortingOrder" ng-show="isgoogle && google_reviews.length!=0">
                             <div class='col-2'>
-                                <a href="{{review.author_url}}"><img ng-src="{{review.profile_photo_url}}" width="50px"></a>
+                                <a target ='_blank' href="{{review.author_url}}"><img ng-src="{{review.profile_photo_url}}" width="50px"></a>
                             </div>
                             <div class='col-10'>
                                 <div><a target='_blank' href="{{review.author_url}}">{{review.author_name}}</a></div>
@@ -819,6 +820,7 @@
             $scope.isnext = false;
             $scope.radVal = 'first';
             
+            $scope.source= 'Your location';
             $scope.showRes = false;
             $scope.showFav = false;
             $scope.placeDetails= false;
@@ -841,6 +843,8 @@
             $scope.place_lat = 0;
             $scope.place_lon = 0;
             $scope.category= 'Default';
+            $scope.showMap =true;
+            
             $scope.set = function() {
                 console.log($scope.isgoogle);
             }
@@ -1180,11 +1184,30 @@
                 $scope.page_index -= 1;
             }
             
-            
+            var panorama;
             $scope.panorama = function()
             {
-                $scope.showMap=false; 
-                google.maps.event.trigger(document.getElementById('streetview'), 'resize')
+                 
+                
+                //google.maps.event.trigger(document.getElementById('streetview'), 'resize');
+                 var myLatLng = {
+                    lat: $scope.place_lat,
+                    lng: $scope.place_lon
+                };
+               var map = new google.maps.Map(document.getElementById('streetview'), {
+                  center: myLatLng,
+                  zoom: 18,
+                  streetViewControl: false
+                });
+                //var toggle = panorama.getVisible();
+                panorama = map.getStreetView();
+                panorama.setPosition(astorPlace);
+                panorama.setPov(/** @type {google.maps.StreetViewPov} */({
+                  heading: 265,
+                  pitch: 0
+                }));
+                panorama.setVisible(true);
+                
             }
             $scope.getDirections = function() {
 
@@ -1212,9 +1235,9 @@
                 if(temp==='my location' || temp==='' || temp==='your location')
                 {
                     console.log('It is my location');
-                    console.log(lat);
-                    console.log(lon);
-                    start = new google.maps.LatLng(lat,lon);
+                    console.log($scope.lat);
+                    console.log($scope.lon);
+                    start = new google.maps.LatLng($scope.lat,$scope.lon);
                 }
                 
                 travel_mode = document.getElementById('travel_mode').value;
@@ -1341,18 +1364,19 @@
                     title: 'Hello World!'
                 });
                 
-               
-                var panorama = new google.maps.StreetViewPanorama(
-                    document.getElementById('streetview'), {
-                        position: myLatLng,
-                        pov: {
-                            heading: 270,
-                            pitch: 0
-                        },
-                        visible: true,
-                        fullScreenControl: true
-                    });
-                google.maps.event.trigger(document.getElementById('streetview'), 'resize');
+               var map2 = new google.maps.Map(document.getElementById('streetview'), {
+                    center: myLatLng,
+                    zoom: 10
+
+                });
+               panorama = map2.getStreetView();
+               panorama.setPosition(myLatLng);
+                panorama.setPov(/** @type {google.maps.StreetViewPov} */({
+                  heading: 265,
+                  pitch: 0
+                }));
+                panorama.setVisible(true);
+                //google.maps.event.trigger(document.getElementById('streetview'), 'resize');
                 var service = new google.maps.places.PlacesService(map);
 
                 service.getDetails({
@@ -1460,8 +1484,9 @@
                             console.log('fail');
 
                         });
-
+                        console.log('Photos');
                         if (place.photos) {
+                            console.log(place.photos);
                             for (var index = 0; index < place.photos.length; ++index) {
                                 $scope.photos.push(place.photos[index].getUrl({
                                     'maxWidth': 200,
@@ -1487,7 +1512,7 @@
                                 $scope.google_reviews[index].time = moment.unix(place.reviews[index].time).format("YYYY-MM-DD HH:mm:ss");
                             }
 
-
+                            //console.log('Google reviews object')
 
                         }
 

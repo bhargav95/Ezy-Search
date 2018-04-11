@@ -119,11 +119,18 @@
             padding-bottom: 15px;
             margin-bottom: 10px;
         }
-#keyword:after {
+#keyname:after {
   content:"*";
   color:red;
 }
+        
+        #fromlabel:after
+        {
+             content:"*";
+            color:red;
+        }
 
+        
         /*    
         .placeResults.ng-hide-remove {
     transition: 1.5s linear opacity;
@@ -271,7 +278,7 @@
   display:block!important;
 }
 */
-
+      
         .yelp-rev {
             opacity: 1;
             transition: 1s linear all;
@@ -354,7 +361,7 @@
                         <h3 class="col-lg-10 text-center title">Travel and Entertainment Search</h3>
                     </div>
                     <div class="form-group row">
-                        <label for="keyword" class='col-lg-2 control-label'>Keyword</label>
+                        <label for="keyword" id="keyname" class='col-lg-2 control-label'>Keyword</label>
                         <div class='col-lg-offset-2 col-lg-8'>
                             <input type="text" id="keyword" name="keyword" ng-class="{'is-invalid' : infoForm.keyword.$invalid && infoForm.keyword.$touched }" ng-model="keyword" class="form-control" required>
                             <div class='invalid-feedback'>Please enter a keyword.</div>
@@ -380,8 +387,8 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class='control-label col-lg-2'>From</label>
-                        <div class='col-lg-8' id='radioButton'>
+                        <label class='control-label col-lg-2' id='fromlabel'>From</label>
+                        <div class='col-lg-8 p-0' id='radioButton'>
 
                             <div class='form-check'>
                                 <label for="options1"></label>
@@ -389,10 +396,10 @@
 
                             </div>
 
-                            <div class='form-check' style="margin: 0;">
+                            <div class='form-check mx-auto'>
                                 <label for="options2"> </label>
-                                <input type="radio" style="margin-left: 0;" name="options" id="options2" value="second" ng-model="radVal"> Others, Please specify: &nbsp;
-                                <input type="text" class="form-control" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' ng-disabled="radVal=='first'" required g-places-autocomplete ng-model="location" />
+                                <input type="radio" style="margin-left: 0;" name="options" id="options2" value="second" ng-model="radVal"> Others, Please specify: 
+                                <input type="text" class="form-control ml-4" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' ng-disabled="radVal=='first'" required g-places-autocomplete ng-model="location" />
                                 <!--                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>-->
                                 <div class='invalid-feedback'>Please enter a location.</div>
 
@@ -462,8 +469,11 @@
                                 <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
                                 <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
                             </div>
-                            <div class="alert alert-warning" role="alert" ng-show="comp_results.length==0 && showRes">
+                            <div class="alert alert-warning" role="alert" ng-show="comp_results.length==0 && showRes && !api_failure">
                                 No records found.
+                            </div>
+                            <div class="alert alert-danger" role="alert" ng-show="api_failure">
+                              Failed to get search results.
                             </div>
                         </div>
 
@@ -497,7 +507,7 @@
                             <div class="alert alert-warning" role="alert" ng-show="favorites.length==0">
                                 No records found.
                             </div>
-
+                           
 
                         </div>
 
@@ -853,7 +863,7 @@
             $scope.comp_results = [];
             $scope.isnext = false;
             $scope.radVal = 'first';
-
+            $scope.api_failure = false;
             $scope.source = 'Your location';
             $scope.showRes = false;
             $scope.showFav = false;
@@ -935,6 +945,7 @@
                 $scope.favselectedIndex = -1;
                 //$('#pbar').css('display','block');
                 formData.keyword = $('#keyword').val();
+                console.log(formData.keyword);
                 formData.category = $scope.category.toLowerCase().replace(" ", "_");
                 formData.distance = $('#distance').val();
                 console.log(formData.distance);
@@ -1010,7 +1021,9 @@
 
 
                 }, function(response) {
+                    $scope.api_failure = true;
                     $scope.showRes = true;
+                
                     console.log('fail');
                     return;
 

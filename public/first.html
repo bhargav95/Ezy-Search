@@ -119,6 +119,10 @@
             padding-bottom: 15px;
             margin-bottom: 10px;
         }
+#keyword:after {
+  content:"*";
+  color:red;
+}
 
         /*    
         .placeResults.ng-hide-remove {
@@ -228,7 +232,25 @@
         .pageResults.ng-enter {
             animation: slideInRight 0.5s both ease-in;
         }
+         .favoriteResults.ng-leave {
+            animation: slideInRight 0.5s both ease-in;
+        }
 
+        .favoriteResults.ng-hide {
+            animation: slideOutLeft 0.5s both ease-in;
+        }
+
+        /*.placeResults.ng-leave        { animation:slideOutRight 0.5s both ease-in; }
+  */
+
+        .favoriteResults.ng-enter {
+            animation: slideInRight 0.5s both ease-in;
+        }
+        
+        .placeResults.ng-leave
+        {
+            animation: slideInRight 0.5s both ease-in;
+        }
         /*
 .placeResults.ng-hide-add,
 .placeResults.ng-hide-remove {
@@ -449,7 +471,7 @@
 
                     </div>
                     <div class='tab-pane fade' aria-labelledby="pills-favorites-tab" id="favs">
-                        <div class="container" ng-show="showFav">
+                        <div class="container favoriteResults" ng-show="showFav">
                             <div class="float-right" ng-show="favorites.length > 0">
                                 <button ng-disabled="favselectedIndex==-1" ng-click="getDetails(row,$index,false)">Details<i class="fa fa-chevron-right"></i></button>
                             </div>
@@ -515,7 +537,7 @@
                 <i class="fa fa-star" ng-class='{favs: checkFavorite(place_id)}'></i>
                 </button>
 
-                    <button ng-click="tweetwindow()">
+                    <button class='btn' ng-click="tweetwindow()">
                 <img src="http://cs-server.usc.edu:45678/hw/hw8/images/Twitter.png" style="width: 30px">
             
                 </button>
@@ -546,6 +568,7 @@
         <!-- Tab panes -->
         <div class="tab-content">
             <div id="tab1" class="container tab-pane active">
+                <div class='container mt-2'>
                 <table class='table table-striped'>
                     <tr>
                         <th>Address</th>
@@ -574,10 +597,10 @@
                     <tr>
                         <th>Hours</th>
                         <td ng-init="open_now= true">
-                            <div ng-show="!open_now">Closed<span><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
-                            <div ng-show="open_now">Open now: {{current_timings}}<span><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
-
-
+                            
+                            <div class='container' ng-show="open_now">Open now: {{current_timings}}<span style="margin-top: 0px;"><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
+                            <div class='container' ng-show="!open_now">Closed<span style="margin: 0px;"><button type="button" class="btn btn-link" data-toggle="modal" data-target="#timings">Daily open hours</button></span></div>
+                            
 
                             <div class="modal fade" id="timings">
                                 <div class="modal-dialog modal-dialog-centered">
@@ -600,7 +623,7 @@
                                                     </tr>
 
                                                 </thead>
-                                                <tbody>
+                                                <tbody ng-show="arr_day_time.length > 0">
                                                     <tr ng-repeat="timestamp in arr_day_time track by $index">
                                                         <td>{{timestamp.day}}</td>
                                                         <td>{{timestamp.time}}</td>
@@ -621,22 +644,26 @@
                         </td>
                     </tr>
                 </table>
+                </div>
 
             </div>
 
             <div id="tab2" class="container tab-pane fade">
-
-                <div class="card-columns" ng-show="photos.length > 0">
+                <div class='container mt-2'>
+                    <div class="card-columns" ng-show="photos.length > 0">
                     <div class="card" ng-repeat="url in photos track by $index">
                         <a href="{{url}}" target="_blank">
                            <img class="card-img-top" ng-src="{{url}}"></a>
                     </div>
 
-                </div>
-                <div class="alert alert-warning" role="alert" ng-show="photos.length==0">
-                    No photos found.
-                </div>
+                    </div>
+                    <div class="alert alert-warning" role="alert" ng-show="photos.length==0">
+                        No photos found.
+                    </div>
 
+                
+                </div>
+                
             </div>
             <div id="tab3" class="container tab-pane fade">
                 <div class="container">
@@ -744,7 +771,7 @@
                 <div class='container' ng-init="isgoogle == true">
 
 
-                    <div class='container google-rev'>
+                    <div class='container google-rev' ng-show="isgoogle">
                         <div class='row border mb-2' ng-repeat="review in google_reviews | orderBy: sortingOrder" ng-show="isgoogle && google_reviews.length!=0">
                             <div class='col-2 mt-4'>
                                 <a target='_blank' href="{{review.author_url}}"><img style="margin: auto;"ng-src="{{review.profile_photo_url}}" width="50px"></a>
@@ -1369,47 +1396,60 @@
                         $scope.place_title = place.name;
                         console.log($scope.place_det[0]);
                         $scope.place_id = place.place_id;
-                        $scope.place_det[0].price_level = '$'.repeat(place.price_level);
+                        
+                        if(place.price_level && place.price_level!= "")
+                            {
+                                 $scope.place_det[0].price_level = '$'.repeat(place.price_level);
+                            }
+                       
                         //console.log(place.address_components);
-                        console.log(place.opening_hours.open_now);
+                        //console.log(place.opening_hours.open_now);
 
                         var utc_day = moment.utc().utcOffset(place.utc_offset).day();
                         console.log(utc_day);
-                        if (place.opening_hours.open_now == true) {
+                        if(place.opening_hours)
+                            {
+                                if (place.opening_hours.open_now == true) {
 
-                            $scope.current_timings = place.opening_hours.weekday_text[utc_day];
-                            var ind = $scope.current_timings.indexOf(":");
-                            $scope.current_timings = $scope.current_timings.slice(ind + 1);
-                            //console.log($scope.current_timings);
-                            $scope.open_now = true;
+                                    $scope.current_timings = place.opening_hours.weekday_text[utc_day];
+                                    var ind = $scope.current_timings.indexOf(":");
+                                    $scope.current_timings = $scope.current_timings.slice(ind + 1);
+                                    //console.log($scope.current_timings);
+                                    $scope.open_now = true;
 
-                        } else {
-                            $scope.open_now = false;
-                        }
-
-
-                        var timings = place.opening_hours.weekday_text.splice(utc_day - 1).concat(place.opening_hours.weekday_text.splice(0, utc_day - 1));
-
-                        $scope.daily_timings = timings;
-
-                        $scope.arr_day_time = []
-                        var isFirstRow = false;
-                        for (var index = 0; index < timings.length; ++index) {
-
-                            var day_time = {}
-                            day_time.day = timings[index].split('y:')[0] + 'y';
-                            day_time.time = timings[index].split('y:')[1];
-                            if (!isFirstRow) {
-                                $scope.current_day_time = day_time;
-                                isFirstRow = true;
-                            } else {
-                                $scope.arr_day_time.push(day_time);
+                                } else {
+                                    $scope.open_now = false;
+                                }
                             }
+                        
+
+                        if(place.opening_hours)
+                            {
+                                var timings = place.opening_hours.weekday_text.splice(utc_day - 1).concat(place.opening_hours.weekday_text.splice(0, utc_day - 1));
+
+                                $scope.daily_timings = timings;
+
+                                $scope.arr_day_time = []
+                                var isFirstRow = false;
+                                for (var index = 0; index < timings.length; ++index) {
+
+                                    var day_time = {}
+                                    day_time.day = timings[index].split('y:')[0] + 'y';
+                                    day_time.time = timings[index].split('y:')[1];
+                                    if (!isFirstRow) {
+                                        $scope.current_day_time = day_time;
+                                        isFirstRow = true;
+                                    } else {
+                                        $scope.arr_day_time.push(day_time);
+                                    }
 
 
 
-                        }
+                                }
 
+                                
+                            }
+                        
                         console.log($scope.arr_day_time);
                         var country = '';
                         var state = '';
@@ -1470,8 +1510,8 @@
                             console.log(place.photos);
                             for (var index = 0; index < place.photos.length; ++index) {
                                 $scope.photos.push(place.photos[index].getUrl({
-                                    'maxWidth': 200,
-                                    'maxHeight': 200
+                                    'maxWidth': 500,
+                                    'maxHeight': 500
                                 }));
                             }
 

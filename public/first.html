@@ -442,7 +442,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-warning': $index==selectedIndex}">
+                                    <tr ng-repeat="row in comp_results[page_index]" ng-class="{'alert alert-warning': $index==(selectedIndex-page_index*20)}">
                                         <td>{{$index+page_index*20+1}}</td>
                                         <td><img ng-src="{{row.icon}}" width="50px"></td>
                                         <td>{{row.name}}</td>
@@ -1346,7 +1346,7 @@
                     $scope.resClick = true;
                     $scope.favClick = false;
                     console.log('Results button clicked');
-                    $scope.selectedIndex = ind;
+                    $scope.selectedIndex = ind+$scope.page_index*20;
                     if ($scope.place_det.length != 0) {
                         if ($scope.place_det[0] == row)
                             return;

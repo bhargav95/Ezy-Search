@@ -433,7 +433,7 @@
                         <div class="container pageResults" ng-show="showRes">
 
                             <div class="float-right" ng-show="comp_results.length > 0">
-                                <button ng-disabled="selectedIndex==-1" ng-click="getDetails(row,$index,true)">Details<i class="fa fa-chevron-right"></i></button>
+                                <button ng-disabled="selectedIndex==-1" ng-click="showLatestDetails(true)">Details<i class="fa fa-chevron-right"></i></button>
                             </div>
                             <table class="table" ng-show="comp_results.length > 0">
                                 <thead>
@@ -473,7 +473,7 @@
                     <div class='tab-pane fade' aria-labelledby="pills-favorites-tab" id="favs">
                         <div class="container favoriteResults" ng-show="showFav">
                             <div class="float-right" ng-show="favorites.length > 0">
-                                <button ng-disabled="favselectedIndex==-1" ng-click="getDetails(row,$index,false)">Details<i class="fa fa-chevron-right"></i></button>
+                                <button ng-disabled="favselectedIndex==-1" ng-click="showLatestDetails(false)">Details<i class="fa fa-chevron-right"></i></button>
                             </div>
                             <table class="table" ng-show="favorites.length > 0">
                                 <thead>
@@ -1305,6 +1305,24 @@
                         console.log('Error');
                     });
 
+            }
+            
+            $scope.showLatestDetails= function(isRes)
+            {
+                $scope.showRes= false;
+                $scope.showFav = false;
+                $scope.placeDetails= true;
+                if(isRes)
+                    {
+                        $scope.resClick = true;
+                        $scope.favClick = false;
+                    }
+                else
+                    {
+                        $scope.resClick = false;
+                        $scope.favClick = true;
+                    }
+                
             }
 
             $scope.getDetails = function(row, ind, isRes) {

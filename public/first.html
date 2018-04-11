@@ -898,6 +898,7 @@
                 //console.log('Got me some old favs');
                 //console.log(localStorage);
                 console.log(localStorage);
+                $scope.favorites = [];
                 for (var i = 0; i < localStorage.length; ++i) {
                     var key = localStorage.key(i);
                     $scope.favorites.push(JSON.parse(localStorage.getItem(key)));
@@ -1059,6 +1060,11 @@
                     localStorage.setItem(place_id, JSON.stringify($scope.place_det[0]));
                     $scope.favorites.push($scope.place_det[0]);
                 }
+                else
+                    {
+                        localStorage.removeItem(place_id);
+                        $scope.getOldFavs();
+                    }
             }
             $scope.addfavorite = function(fav_id, ind) {
 
@@ -1073,6 +1079,12 @@
                     localStorage.setItem(fav_id, JSON.stringify($scope.results[ind]));
                     $scope.favorites.push($scope.results[ind]);
                 }
+                
+                else
+                    {
+                        localStorage.removeItem(fav_id);
+                        $scope.getOldFavs();
+                    }
 
                 //console.log('Retrieval: ')
                 //console.log(localStorage.getItem(fav_id));

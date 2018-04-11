@@ -356,7 +356,7 @@
         <div class='col-offset-6'>
             <div class='offset-lg-2 col-lg-8'>
 
-                <form class="bg-light" id='infoForm' name='infoForm'>
+                <form class="bg-light justify-content-center" id='infoForm' name='infoForm'>
                     <div class='form-group row'>
                         <h3 class="col-lg-10 text-center title">Travel and Entertainment Search</h3>
                     </div>
@@ -594,7 +594,7 @@
                     </tr>
                     <tr ng-show="place_det[0].rating!== undefined">
                         <th>Rating</th>
-                        <td><span style='display: inline;'>{{place_det[0].rating}}</span><span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: place_det[0].rating, starWidth: '20px'}"></rate-yo></span></td>
+                        <td><div><div style="float:left;">{{place_det[0].rating}}</div><div class="mt-1" style="float:left;"><rate-yo style="float:left;" on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: place_det[0].rating, starWidth: '16px'}"></rate-yo></div></div></td>
                     </tr>
                     <tr ng-show="place_det[0].url !== undefined">
                         <th>Google Page</th>
@@ -783,12 +783,12 @@
 
                     <div class='container google-rev' ng-show="isgoogle">
                         <div class='row border mb-2' ng-repeat="review in google_reviews | orderBy: sortingOrder" ng-show="isgoogle && google_reviews.length!=0">
-                            <div class='col-2 mt-4'>
+                            <div class='col-2 justify-content-center'>
                                 <a target='_blank' href="{{review.author_url}}"><img style="margin: auto;"ng-src="{{review.profile_photo_url}}" width="50px"></a>
                             </div>
                             <div class='col-10'>
                                 <div><a target='_blank' href="{{review.author_url}}">{{review.author_name}}</a></div>
-                                <span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '20px'}"></rate-yo>  </span><span>{{review.time}}</span>
+                                <span class="mt-1" style="float:left;"><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '15px'}"></rate-yo> </span> <span style="float:left;">{{review.time}}</span><br/>
                                 <div ng-if="review.text.length > 0">
                                     {{review.text}}
                                 </div>
@@ -803,12 +803,12 @@
                     <div id="yelp" class='container yelp-rev' ng-show="!isgoogle">
 
                         <div class='row border mb-2' ng-repeat="review in yelp_reviews | orderBy: yelpsortingOrder" ng-show="!isgoogle && yelp_reviews.length!=0">
-                            <div class='col-2 mt-4'>
+                            <div class='col-2 justify-content-center'>
                                 <a href="{{review.url}}"><img ng-src="{{review.user.image_url}}" width="50px"></a>
                             </div>
                             <div class='col-10'>
                                 <div><a target='_blank' href="{{review.url}}">{{review.user.name}}</a></div>
-                                <span><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '20px'}"></rate-yo> </span> <span>{{review.time_created}}</span>
+                                <span class="mt-1" style="float:left;"><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '15px'}"></rate-yo> </span> <span style="float:left;">{{review.time_created}}</span><br/>
                                 <div ng-if="review.text.length > 0">
                                     {{review.text}}
                                 </div>

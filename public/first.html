@@ -1054,10 +1054,10 @@
                     top = Math.round((winHeight / 2) - (height / 2));
                 }
 
-                var tweetText = 'Check out ' + $scope.place_det[0].name + ' located at ' + $scope.place_det[0].formatted_address + ' Website: ' + $scope.place_det[0].website;
+                var tweetText = 'Check out ' + encodeURI($scope.place_det[0].name) + ' located at ' + encodeURI($scope.place_det[0].formatted_address) + ' Website: ';
                 var hashTags = ['TravelAndEntertainmentSearch'];
-                var url = ''
-                window.open("https://twitter.com/intent/tweet?text=" + tweetText + '&hashtags=' + hashTags, 'intent', windowOptions + ',width=' + width +
+                var url =  encodeURI($scope.place_det[0].website);
+                window.open("https://twitter.com/intent/tweet?text=" + tweetText + '&url=' + url+ '&hashtags=' + hashTags, 'intent', windowOptions + ',width=' + width +
                     ',height=' + height + ',left=' + left + ',top=' + top);
 
 

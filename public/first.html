@@ -1570,14 +1570,7 @@
                         if (place.reviews) {
                             $scope.google_reviews = place.reviews;
 
-                            for (var index = 0; index < place.reviews.length; ++index) {
-
-                                var val = "#rateYo" + index;
-                                var b = document.getElementById(val);
-
-
-                            }
-
+                            
 
                             for (var index = 0; index < place.reviews.length; ++index) {
                                 $scope.google_reviews[index].time = moment.unix(place.reviews[index].time).format("YYYY-MM-DD HH:mm:ss");

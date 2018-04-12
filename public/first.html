@@ -788,10 +788,10 @@
 
                     <div class='container google-rev' ng-show="isgoogle">
                         <div class='row border mb-2' ng-repeat="review in google_reviews | orderBy: sortingOrder" ng-show="isgoogle && google_reviews.length!=0">
-                            <div class='col-2 justify-content-center'>
-                                <a target='_blank' href="{{review.author_url}}"><img style="margin: auto;"ng-src="{{review.profile_photo_url}}" width="50px"></a>
+                            <div class='col-1 justify-content-center'>
+                                <a target='_blank' href="{{review.author_url}}"><img style="margin: auto;" ng-src="{{review.profile_photo_url}}" width="50px"></a>
                             </div>
-                            <div class='col-10'>
+                            <div class='col-11'>
                                 <div><a target='_blank' href="{{review.author_url}}">{{review.author_name}}</a></div>
                                 <span class="mt-1" style="float:left;"><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '15px'}"></rate-yo> </span> <span style="float:left;">{{review.time}}</span><br/>
                                 <div ng-if="review.text.length > 0">
@@ -808,10 +808,10 @@
                     <div id="yelp" class='container yelp-rev' ng-show="!isgoogle">
 
                         <div class='row border mb-2' ng-repeat="review in yelp_reviews | orderBy: yelpsortingOrder" ng-show="!isgoogle && yelp_reviews.length!=0">
-                            <div class='col-2 justify-content-center'>
+                            <div class='col-1 justify-content-center'>
                                 <a href="{{review.url}}"><img ng-src="{{review.user.image_url}}" width="50px"></a>
                             </div>
-                            <div class='col-10'>
+                            <div class='col-11'>
                                 <div><a target='_blank' href="{{review.url}}">{{review.user.name}}</a></div>
                                 <span class="mt-1" style="float:left;"><rate-yo on-set="set" ng-model="rating" read-only="options.readOnly" options="{ratedFill: '#f00', rating: review.rating, starWidth: '15px'}"></rate-yo> </span> <span style="float:left;">{{review.time_created}}</span><br/>
                                 <div ng-if="review.text.length > 0">

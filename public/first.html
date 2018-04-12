@@ -401,7 +401,7 @@
                                 <input type="radio" style="margin-left: 0;" name="options" id="options2" value="second" ng-model="radVal"> Others, Please specify: 
                                 <input type="text" class="form-control ml-4" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' ng-disabled="radVal=='first'" required g-places-autocomplete ng-model="location" />
                                 <!--                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>-->
-                                <div class='invalid-feedback'>Please enter a location.</div>
+                                <div ng-show="radVal=='second'" class='invalid-feedback'>Please enter a location.</div>
 
                             </div>
                         </div>

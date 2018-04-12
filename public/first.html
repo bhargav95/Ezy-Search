@@ -370,7 +370,7 @@
 
                     <div class="form-group row">
 
-                        <label for="category" class='col-2'>Category</label>
+                        <label for="category" class='col-lg-2'>Category</label>
 
                         <div class='col-6'>
                             <select class="form-control col-*" id="category" name="category" ng-model="category">
@@ -380,7 +380,7 @@
                     </div>
 
                     <div class="form-group row">
-                        <label for="distance" class='control-label col-2'>Distance</label>
+                        <label for="distance" class='control-label col-lg-2'>Distance</label>
                         <div class='col-offset-2 col-6'>
                             <input type="number" id="distance" name="distance" class="form-control" placeholder="10">
 
@@ -487,7 +487,7 @@
                     </div>
                     <div class='tab-pane fade' aria-labelledby="pills-favorites-tab" id="favs">
                         <div class="container favoriteResults" ng-show="showFav">
-                            <div class="float-right" ng-show="favorites.length > 0">
+                            <div class="d-flex justify-content-end" ng-show="favorites.length > 0">
                                 <button ng-disabled="favselectedIndex==-1" ng-click="showLatestDetails(false)">Details<i class="fa fa-chevron-right"></i></button>
                             </div>
                             <table class="table" ng-show="favorites.length > 0">

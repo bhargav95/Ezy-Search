@@ -354,15 +354,15 @@
 
     <div class='container-fluid'>
         <div class='col-offset-6'>
-            <div class='offset-lg-2 col-lg-8'>
+            <div class='offset-2 col-8'>
 
                 <form class="bg-light justify-content-center" id='infoForm' name='infoForm'>
                     <div class='form-group row'>
-                        <h3 class="col-lg-10 text-center title">Travel and Entertainment Search</h3>
+                        <h3 class="col-10 text-center title">Travel and Entertainment Search</h3>
                     </div>
                     <div class="form-group row">
                         <label for="keyword" id="keyname" class='col-lg-2 control-label'>Keyword</label>
-                        <div class='col-lg-offset-2 col-lg-8'>
+                        <div class='col-offset-2 col-8'>
                             <input type="text" id="keyword" name="keyword" ng-class="{'is-invalid' : infoForm.keyword.$invalid && infoForm.keyword.$touched }" ng-model="keyword" class="form-control" required>
                             <div class='invalid-feedback'>Please enter a keyword.</div>
                         </div>
@@ -370,25 +370,25 @@
 
                     <div class="form-group row">
 
-                        <label for="category" class='col-lg-2'>Category</label>
+                        <label for="category" class='col-2'>Category</label>
 
-                        <div class='col-lg-6'>
-                            <select class="form-control col-lg-*" id="category" name="category" ng-model="category">
+                        <div class='col-6'>
+                            <select class="form-control col-*" id="category" name="category" ng-model="category">
                     <option ng-repeat="x in formHeaders" value={{x}}>{{x}}</option>
                   </select>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="distance" class='control-label col-lg-2'>Distance</label>
-                        <div class='col-lg-offset-2 col-lg-6'>
+                        <label for="distance" class='control-label col-2'>Distance</label>
+                        <div class='col-offset-2 col-6'>
                             <input type="number" id="distance" name="distance" class="form-control" placeholder="10">
 
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class='control-label col-lg-2' id='fromlabel'>From</label>
-                        <div class='col-lg-8 p-0' id='radioButton'>
+                        <div class='col-8 p-0' id='radioButton'>
 
                             <div class='form-check'>
                                 <label for="options1"></label>
@@ -396,9 +396,9 @@
 
                             </div>
 
-                            <div class='form-check mx-auto'>
+                            <div class='form-check'>
                                 <label for="options2"> </label>
-                                <input type="radio" style="margin-left: 0;" name="options" id="options2" value="second" ng-model="radVal"> Others, Please specify: 
+                                <input type="radio" name="options" id="options2" value="second" ng-model="radVal"> Others, Please specify: 
                                 <input type="text" class="form-control ml-4" name='location' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' ng-disabled="radVal=='first'" required g-places-autocomplete ng-model="location" />
                                 <!--                                <input type="text" name='location' class='form-control' id='location' ng-model="location" ng-class="{ 'is-invalid' : infoForm.location.$invalid && infoForm.location.$touched }" placeholder='Enter a location' disabled required>-->
                                 <div ng-show="radVal=='second'" class='invalid-feedback'>Please enter a location.</div>
@@ -411,10 +411,10 @@
 
 
                     <div class="form-group row">
-                        <div class='col-lg-4'>
+                        <div class='col-4'>
                             <button type="submit" ng-init="geolocation()" ng-click="getJSON()" id='search' name="search" class="btn btn-primary" ng-disabled="infoForm.keyword.$invalid ||
   (radVal=='second' && infoForm.location.$invalid)|| !geolocate"><i class="fa fa-search"></i>Search</button>
-                            <button type="button" name="clear" ng-click="clearAll()" class='btn btn-light'>Clear</button>
+                            <button class='btn btn-light' type="button" name="clear" ng-click="clearAll()" class='btn btn-light'>Clear</button>
 
                         </div>
 
@@ -424,7 +424,7 @@
 
 
             <div class='container'>
-                <div class='container col-lg-4 col-offset-6 centered'>
+                <div class='d-flex justify-content-center'>
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" id="pills-results-tab" ng-click="placeDetails=false;showRes=true;" data-toggle="pill" href="#res" role="tab" aria-controls="res" aria-selected="true">Result</a>
@@ -439,8 +439,8 @@
                     <div class='tab-pane fade show active' aria-labelledby="pills-results-tab" id="res">
                         <div class="container pageResults" ng-show="showRes">
 
-                            <div class="float-right" ng-show="comp_results.length > 0">
-                                <button ng-disabled="selectedIndex==-1" ng-click="showLatestDetails(true)">Details<i class="fa fa-chevron-right"></i></button>
+                            <div class="d-flex justify-content-end" ng-show="comp_results.length > 0">
+                                <button class='btn btn-light' ng-disabled="selectedIndex==-1" ng-click="showLatestDetails(true)">Details<i class="fa fa-chevron-right"></i></button>
                             </div>
                             <table class="table" ng-show="comp_results.length > 0">
                                 <thead>
@@ -465,9 +465,14 @@
                             </table>
 
 
-                            <div class='text-center' ng-show="comp_results.length > 0">
-                                <button id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
-                                <button id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
+                            <div class='d-flex justify-content-center' ng-show="comp_results.length > 0">
+                                <div class="mr-2">
+                                    <button class="btn btn-light p-2" id="prev" ng-show="page_index!=0" ng-click="getPreviousToken()">Previous</button>
+                                </div>
+                                <div>
+                                     <button class="btn btn-light" id="next" ng-show="page_tokens[page_index]!== undefined" ng-click="getNextToken()">Next </button>
+                                </div>
+                                
                             </div>
                             <div class="alert alert-warning" role="alert" ng-show="comp_results.length==0 && showRes && !api_failure">
                                 No records found.

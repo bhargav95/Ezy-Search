@@ -1025,6 +1025,16 @@
                         }
                         $scope.showRes = true;
                     }
+                    
+                    else
+                        {
+                            $scope.submitted = true;
+                            $('#pbar').css('display', 'none');
+                            $('#mainbar').css('display', 'none');
+                            $scope.results = response.data.results;
+                            $scope.showRes=true;
+                            
+                        }
 
 
                 }, function(response) {

@@ -1278,11 +1278,14 @@
                 });
 
                 var directionsService = new google.maps.DirectionsService;
+                document.getElementById('right-panel').innerHTML='';
                 var directionsDisplay = new google.maps.DirectionsRenderer({
                     draggable: true,
                     map: map,
                     panel: document.getElementById('right-panel')
                 });
+                
+                
                 //var map2= document.getElementById('placeDetailsMap');
                 var start = document.getElementById('fromlocation').value;
                 var end = document.getElementById('destination').value;

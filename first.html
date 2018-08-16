@@ -659,37 +659,7 @@
                         } else {
                             console.log(lat);
                         }
-                        /*$http.get('/nearbysearch', {params: {
-                         keyword: formData.keyword,
-                         category: formData.category,
-                         distance: formData.distance,
-                         place: formData.place,
-                         lat: formData.lat,
-                         lon: formData.lon
-                       }}).then(function (response) {
-                         if (response.data.status !=undefined)
-                            //console.log('Success');
-                            console.log(response.data);
-
-                            //console.log(submitted);
-                            if(response.data.status=='OK')
-                            {
-                               $scope.submitted = true;
-                               $scope.results= response.data.results;
-
-                            }
-
-                         }, function (response) {
-
-                            console.log('fail');
-
-                         });
-
-                                
-                              } else {
-                                alert('Geocode was not successful for the following reason: ' + status);
-                              }
-                            });*/
+                        
                     });
                 } else {
                     formData.lat = lat;
@@ -819,9 +789,7 @@
             }
 
             $scope.getNextToken = function() {
-                //console.log($scope.page_index);
-                //console.log($scope.page_tokens);
-                //$scope.comp_results.push()
+                
 
                 if ($scope.comp_results[$scope.page_index + 1] !== undefined) {
                     $scope.page_index += 1;
@@ -884,7 +852,7 @@
                     map: map,
                     panel: document.getElementById('right-panel')
                 });
-                //var map2= document.getElementById('placeDetailsMap');
+                
                 var start = document.getElementById('fromlocation').value;
                 var end = document.getElementById('destination').value;
 

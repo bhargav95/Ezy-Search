@@ -1,9 +1,9 @@
 var express = require('express');
 var app = express();
 
-var geocode_key = 'AIzaSyBn0GiQxOP7NmQNom0hY8YPlmDozSiopSE';
+var geocode_key = 'YOUR GEOLOCATION API KEY';
 
-var nearby_key = 'AIzaSyDKBBrurLUSNV-68rOTgWWvc2Bz6t6_kpw';
+var nearby_key = 'YOUR PLACES SEARCH API KEY';
 const request = require('request');
 var path    = require("path");
 var bodyParser     =     require("body-parser");
@@ -11,7 +11,7 @@ var bodyParser     =     require("body-parser");
 'use strict';
 const yelp = require('yelp-fusion');
 
-const client = yelp.client('zscQJboA8f4Dd2e3LSxV4AufNZLiiJ0165WW0NyPDO3wafoyRDi2qjZIH0KOG2Kk_rT_82vWCO-eEvUx4ZEB76LoT_B3aF_kxY42dD2uJIO735tXO2MtVrOkf4TAWnYx');
+const client = yelp.client('YOUR YELP API KEY');
 
 // matchType can be 'lookup' or 'best'
 

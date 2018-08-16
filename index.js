@@ -170,42 +170,7 @@ function nearbysearch(req, res)
 
 }
 
-/*
-app.get('/nearbysearch', function(req,res)
-    {
-        console.log('request recieved');
-        //console.log(req.body);
-        //console.log(req.body.place);
-        var lat=0;
-        var lon=0;
-        var keywordnospace = req.query.keyword;
-        //sleep(1000);
-        keywordnospace = keywordnospace.replace(/\s/g, '');
-        
-        lat = req.query.lat;
-        lon= req.query.lon;
-    
 
-        console.log('Reached here');
-
-        var radius = (req.query.distance)*1600;
-
-        //var next_tok='';
-        var nearbyinfo='';
-        //console.log('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lon+'&radius='+radius+'&type='+req.body.category+'&keyword='+keywordnospace+'&key='+nearby_key);
-        request.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lon+'&radius='+radius+'&type='+req.query.category+'&keyword='+req.query.keyword+'&key='+nearby_key,
-          (error,response,body) =>
-          {
-            nearbyinfo = body;
-            res.send(body);
-            
-
-          });
-
-        //res.send(nearbyinfo);
-
-    }
-)*/
 
 app.listen(3154,function(){
   console.log('Listening mate');

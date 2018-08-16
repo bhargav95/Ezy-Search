@@ -140,6 +140,17 @@ app.get('/geocoding', function(req,res)
         }
        );
 
+app.get('/placeDetails', function(req,res)
+        {
+         request.get('https://maps.googleapis.com/maps/api/place/details/json?placeid='+req.query.placeid+'&key='+nearby_key,
+                    (error,response,body) =>
+                        {
+                            console.log(body);
+                            res.send(body);
+                        }
+                   );
+    
+});
 function nearbysearch(req, res)
 {
     var lat = req.query.lat;

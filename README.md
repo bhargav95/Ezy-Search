@@ -8,4 +8,4 @@ as well as Yelp Fusion API's.
 - Backend code in Node.js and the site was setup on AWS.
 - Bootstrap and AngularJS.
 Note: Demo video run locally
-<video src="video.mp4" width="320" height="200" controls preload></video>
+<video src="ezy-search.mov" width="320" height="200" controls preload></video>
